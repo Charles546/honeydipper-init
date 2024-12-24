@@ -1,0 +1,19 @@
+---
+repos:
+  - repo: https://github.com/honeydipper/honeydipper-config-essentials.git
+    branch: main
+
+drivers:
+  daemon:
+    configCheckInterval: 60m
+
+  redisqueue: &redis
+    connection:
+      Addr: {% .env.REDIS_ADDR %}
+      Password: {% .env.REDIS_AUTH %}
+  redispubsub: *redis
+  redislock: *redis
+  api-broadcast: *redis
+
+  kubernetes:
+    api_timeout: "30"

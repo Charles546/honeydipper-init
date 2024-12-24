@@ -1,0 +1,20 @@
+daemon:
+  serviceAccountName: honeydipper
+  replicaCount: 2
+  image:
+    tag: 3.6.0
+  env:
+    - name: REPO
+      value: https://github.com/Charles546/honeydipper-init.git
+    - name: BRANCH
+      value: main
+    - name: REDIS_ADDR
+      value: redis:6379
+    - name: REDIS_AUTH
+      value: vault:/secret/honeydipper/redis#auth
+    - name: DIPPER_SSH_KEY
+      value: vault:/secret/honeydipper/git_keys#honeydipper-init
+driver:
+  redis:
+    local: false
+
