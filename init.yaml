@@ -9,8 +9,8 @@ drivers:
 
   redisqueue: &redis
     connection:
-      Addr: {% .env.REDIS_ADDR %}
-      Password: {% .env.REDIS_AUTH %}
+      Addr: "{% .env.REDIS_ADDR %}"
+      Password: "{% .env.REDIS_AUTH %}"
   redispubsub: *redis
   redislock: *redis
   api-broadcast: *redis
