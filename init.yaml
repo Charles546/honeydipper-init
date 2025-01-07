@@ -2,6 +2,9 @@
 repos:
   - repo: https://github.com/honeydipper/honeydipper-config-essentials.git
     branch: main
+  - repo: https://github.com/honeydipper/honeydipper-config-essentials.git
+    branch: CH-vault
+    path: vault
 
 drivers:
   daemon:

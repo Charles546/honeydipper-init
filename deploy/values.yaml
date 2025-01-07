@@ -14,7 +14,7 @@ daemon:
     - name: REPO
       value: git@github.com:Charles546/honeydipper-init.git
   image:
-    tag: 3.6.0
+    tag: dev-0cbac6a
   pod_annotations:
     vault.security.banzaicloud.io/vault-addr: https://vault.m4cloud.duckdns.org:8200
     vault.security.banzaicloud.io/vault-skip-verify: "false"
