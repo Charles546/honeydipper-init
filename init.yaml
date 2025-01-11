@@ -31,7 +31,7 @@ drivers:
         type: github
         app_id: "1109324"
         installation_id: "59458128"
-        key: LOOKUP[valut,/secret/data/honeydipper/github#ssh_key]
+        key: LOOKUP[vault,/secret/data/honeydipper/github#ssh_key]
         permissions:
           contents: read
           statuses: write
