@@ -20,3 +20,16 @@ drivers:
 
   kubernetes:
     api_timeout: "30"
+
+  vault:
+    addr: https://vault.m4cloud.duckdns.org:8200
+    k8sRole: honeydipper
+
+systems:
+  slack_bot:
+    data:
+      token: LOOKUP[vault,/secret/data/honeydipper/slack#bot_token]
+      interact_token: $?nil
+      slash_token: $?nil
+      signatureHeader: X-Slack-Signature
+      signatureSecret: LOOKUP[vault,/secret/data/honeydipper/slack#signing_secret]
