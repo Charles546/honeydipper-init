@@ -23,7 +23,8 @@ drivers:
 
   vault:
     addr: https://vault.m4cloud.duckdns.org:8200
-    k8sRole: honeydipper
+    k8sRole: '{% empty .env.VAULT_TOKEN | ternary "honeydipper" "" %}'
+    token: '{% with .env.VAULT_TOKEN %}{% . %}{% end %}'
 
   web:
     token_sources:
