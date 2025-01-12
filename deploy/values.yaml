@@ -13,8 +13,10 @@ daemon:
       value: vault:secret/data/honeydipper/redis#auth
     - name: REPO
       value: git@github.com:Charles546/honeydipper-init.git
+    - name: DEBUG
+      value: "*"
   image:
-    tag: "3.7.0"
+    tag: "CH-vault-5ffe8f3"
   pod_annotations:
     vault.security.banzaicloud.io/vault-addr: https://vault.m4cloud.duckdns.org:8200
     vault.security.banzaicloud.io/vault-skip-verify: "false"
