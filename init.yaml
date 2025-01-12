@@ -52,3 +52,15 @@ systems:
       signatureHeader: X-Hub-Signature-256
       signatureSecret: LOOKUP[vault,/secret/data/honeydipper/github#signing_secret]
       token: $?nil # use signature
+
+rules:
+  - when:
+      source:
+        system: github
+        trigger: push
+    do:
+      if_match:
+        - git_repo: Charles546/honeydipper-init
+          git_ref: main
+      call_workflow: reload
+      description: reload honeydipper
