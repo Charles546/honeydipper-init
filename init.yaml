@@ -6,79 +6,8 @@ repos:
     branch: CH-vault
     path: vault
 
-drivers:
-  daemon:
-    configCheckInterval: 60m
-
-  redisqueue: &redis
-    connection:
-      Addr: "{% .env.REDIS_ADDR %}"
-      Password: "{% .env.REDIS_AUTH %}"
-  redispubsub: *redis
-  redislock: *redis
-  api-broadcast: *redis
-
-  kubernetes:
-    api_timeout: "30"
-
-  vault:
-    addr: https://vault.m4cloud.duckdns.org:8200
-    k8sRole: '{% empty .env.VAULT_TOKEN | ternary "honeydipper" "" %}'
-    token: '{% with .env.VAULT_TOKEN %}{% . %}{% end %}'
-
-  web:
-    token_sources:
-      hd_github_app:
-        type: github
-        app_id: "1109324"
-        installation_id: "59458128"
-        key: LOOKUP[vault,/secret/data/honeydipper/github#ssh_key]
-        permissions:
-          contents: read
-          statuses: write
-
-systems:
-  slack_bot:
-    data:
-      token: LOOKUP[vault,/secret/data/honeydipper/slack#bot_token]
-      interact_token: $?nil # use signature
-      slash_token: $?nil # use signature
-      signatureHeader: X-Slack-Signature
-      signatureSecret: LOOKUP[vault,/secret/data/honeydipper/slack#signing_secret]
-
-  github:
-    data:
-      tokenSource: hd_github_app
-      signatureHeader: X-Hub-Signature-256
-      signatureSecret: LOOKUP[vault,/secret/data/honeydipper/github#signing_secret]
-      token: $?nil # use signature
-
-rules:
-  - when:
-      source:
-        system: github
-        trigger: push
-    do:
-      if_match:
-        - git_repo: Charles546/honeydipper-init
-          git_ref: refs/heads/main
-      call_workflow: reload
-      description: reload honeydipper
-
-contexts:
-  _default:
-    notify:
-      chat_system: slack_bot
-      notify_on_error-:
-        - '#honeydipper-notify'
-
-    channel_translate:
-      channel_map:
-        '#honeydipper-notify': C088AN8V4EN
-
-  _slashcommands:
-    slashcommand:
-      slashcommands:
-        reload:
-          allowed_channels:
-            - '#honeydipper-notify'
+includes:
+  - drivers.yaml
+  - systems.yaml
+  - rules.yaml
+  - contexts.yaml

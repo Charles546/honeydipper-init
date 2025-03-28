@@ -1,0 +1,12 @@
+---
+rules:
+  - when:
+      source:
+        system: github
+        trigger: push
+    do:
+      if_match:
+        - git_repo: Charles546/honeydipper-init
+          git_ref: refs/heads/main
+      call_workflow: reload
+      description: reload honeydipper

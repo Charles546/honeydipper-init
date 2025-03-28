@@ -1,0 +1,18 @@
+---
+contexts:
+  _default:
+    notify:
+      chat_system: slack_bot
+      notify_on_error-:
+        - '#honeydipper-notify'
+
+    channel_translate:
+      channel_map:
+        '#honeydipper-notify': C088AN8V4EN
+
+  _slashcommands:
+    slashcommand:
+      slashcommands:
+        reload:
+          allowed_channels:
+            - '#honeydipper-notify'
