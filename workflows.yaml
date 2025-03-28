@@ -18,7 +18,7 @@ workflows:
       - unless_match:
           done: "true"
         steps:
-          - call_function: {{ .ctx.ai_system }}.chatContinue
+          - call_function: '{{ .ctx.ai_system }}.chatContinue'
             export:
               response+: $ctx.content
           - call_workflow: notify
