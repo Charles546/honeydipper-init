@@ -1,0 +1,41 @@
+---
+workflows:
+  ai_chat:
+    with:
+    steps:
+      - call_function: {{ .ctx.ai_system }}.chat
+        with:
+          convID: $ctx.convID,`{{ now | date "2006-01-02T15:04:05Z07:00" }}`
+        export:
+          response: $ctx.content
+      - call_workflow: notify
+        with:
+          blocks:
+            - type: section
+              text:
+                text: '{{ .ctx.response }} :thinking2:'
+                type: mrkdwn
+
+      - unless_match:
+          done: "true"
+        steps:
+          - call_function: {{ .ctx.ai_system }}.chatContinue
+            export:
+              response+: $ctx.content
+          - call_workflow: notify
+            with:
+              blocks:
+                - type: section
+                  text:
+                    text: '{{ .ctx.response }} :thinking2:'
+                    type: mrkdwn
+              update: true
+
+      - call_workflow: notify
+        with:
+          blocks:
+            - type: section
+              text:
+                text: $ctx.response
+                type: mrkdwn
+          update: true

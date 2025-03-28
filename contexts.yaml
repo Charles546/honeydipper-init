@@ -16,3 +16,15 @@ contexts:
         reload:
           allowed_channels:
             - '#honeydipper-notify'
+
+        ai:
+          allowed_channels:
+            - '#honeydipper-notify'
+          workflow: ai_chat
+          usage: send a chat message to the AI model.
+
+    #################### define the parameters needed for the slash commands ########################
+    ai_chat:
+      prompt: '{{ trim .ctx.parameters }}'
+      convID: onlyone
+      ai_system: $ctx.ai_system,"deepseek-r1"

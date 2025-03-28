@@ -14,3 +14,40 @@ systems:
       signatureHeader: X-Hub-Signature-256
       signatureSecret: LOOKUP[vault,/secret/data/honeydipper/github#signing_secret]
       token: $?nil # use signature
+
+  ollama:
+    functions:
+      chat:
+        driver: ollama
+        rawAction: chat
+        parameters:
+          engine: $ctx.engine,sysData.engine
+          convID: $ctx.convID
+        export:
+          content: $?data.content
+          done: $?data.done
+          counter: $data.counter
+          convID: $ctx.convID
+
+      chatContinue:
+        driver: ollama
+        rawAction: chatContinue
+        parameters:
+          convID: $ctx.convID
+          counter: $ctx.counter
+        export:
+          content: $?data.content
+          done: $?data.done
+
+      chatStop:
+        driver: ollama
+        rawAction: chatStop
+        parameters:
+          convID: $ctx.convID
+          counter: $ctx.counter
+
+  deepseek-r1:
+    extends:
+      - ollama
+    data:
+      engine: deepseek-r1:1.5b
