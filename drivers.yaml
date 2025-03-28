@@ -30,6 +30,8 @@ drivers:
   redispubsub: *redis
   redislock: *redis
   api-broadcast: *redis
+  redis-cache: *redis
+    DB: "1"
 
   kubernetes:
     api_timeout: "30"
