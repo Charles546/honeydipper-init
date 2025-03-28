@@ -23,6 +23,7 @@ systems:
         parameters:
           engine: $ctx.engine,sysData.engine
           convID: $ctx.convID
+          prompt: $ctx.prompt
         export:
           content: $?data.content
           done: $?data.done
