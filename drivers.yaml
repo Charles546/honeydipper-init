@@ -30,7 +30,8 @@ drivers:
   redispubsub: *redis
   redislock: *redis
   api-broadcast: *redis
-  redis-cache: *redis
+  redis-cache:
+    <<: *redis
     connection:
       DB: "1"
 
