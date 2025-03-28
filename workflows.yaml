@@ -12,6 +12,10 @@ workflows:
           blocks:
             - type: section
               text:
+                text: '{{ .ctx.raw | toYaml }}'
+                type: plain_text
+            - type: section
+              text:
                 text: '{{ .ctx.response }} :thinking2:'
                 type: mrkdwn
 
@@ -26,6 +30,10 @@ workflows:
               blocks:
                 - type: section
                   text:
+                    text: '{{ .ctx.raw | toYaml }}'
+                    type: plain_text
+                - type: section
+                  text:
                     text: '{{ .ctx.response }} :thinking2:'
                     type: mrkdwn
               update: true
@@ -33,6 +41,10 @@ workflows:
       - call_workflow: notify
         with:
           blocks:
+            - type: section
+              text:
+                text: '{{ .ctx.raw | toYaml }}'
+                type: plain_text
             - type: section
               text:
                 text: $ctx.response

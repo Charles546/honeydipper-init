@@ -26,8 +26,9 @@ systems:
         export:
           content: $?data.content
           done: $?data.done
-          counter: $data.counter
+          counter: $?data.counter
           convID: $ctx.convID
+          raw: $data
 
       chatContinue:
         driver: ollama
@@ -38,6 +39,7 @@ systems:
         export:
           content: $?data.content
           done: $?data.done
+          raw: $data
 
       chatStop:
         driver: ollama
@@ -45,6 +47,8 @@ systems:
         parameters:
           convID: $ctx.convID
           counter: $ctx.counter
+        export:
+          raw: $data
 
   deepseek-r1:
     extends:
