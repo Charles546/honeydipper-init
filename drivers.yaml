@@ -31,8 +31,9 @@ drivers:
   redislock: *redis
   api-broadcast: *redis
   redis-cache:
-    <<: *redis
     connection:
+      Addr: "{% .env.REDIS_ADDR %}"
+      Password: "{% .env.REDIS_AUTH %}"
       DB: "1"
 
   kubernetes:
