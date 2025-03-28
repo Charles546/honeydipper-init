@@ -2,6 +2,26 @@
 drivers:
   daemon:
     configCheckInterval: 60m
+    featureMap:
+      global:
+        cache: redis-cache
+    features:
+      global:
+        - name: cache
+      operator:
+        - name: "driver:ollama"
+
+    drivers:
+      redis-cache:
+        name: redis-cache
+        type: builtin
+        handlerData:
+          shortName: redis-cache
+      ollama:
+        name: ollama
+        type: builtin
+        handlerData:
+          shortName: hd-driver-ollama
 
   redisqueue: &redis
     connection:
