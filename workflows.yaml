@@ -6,7 +6,7 @@ workflows:
         with:
           convID: $ctx.convID,`{{ now | date "2006-01-02T15:04:05Z07:00" }}`
         export:
-          response: $ctx.content
+          response: '{{ eq .ctx.busy "true" | ternary "busy" .ctx.content }}'
       - call_workflow: notify
         with:
           blocks:
@@ -19,8 +19,9 @@ workflows:
                 text: '{{ .ctx.response }} :thinking2:'
                 type: mrkdwn
 
-      - unless_match:
-          done: "true"
+      - until_match:
+          - done: "true"
+          - busy: "true"
         steps:
           - call_function: '{{ .ctx.ai_system }}.chatContinue'
             export:

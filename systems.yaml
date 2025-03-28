@@ -28,6 +28,7 @@ systems:
           done: $?data.done
           counter: $?data.counter
           convID: $ctx.convID
+          busy: $?data.busy
           raw: $data
 
       chatContinue:
