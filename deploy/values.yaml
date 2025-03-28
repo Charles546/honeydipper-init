@@ -13,6 +13,8 @@ daemon:
       value: vault:secret/data/honeydipper/redis#auth
     - name: REPO
       value: git@github.com:Charles546/honeydipper-init.git
+    - name: OLLAMA_HOST
+      value: http://truenas.lan:30068
   image:
     tag: "CH-vault-03272025"
   pod_annotations:
