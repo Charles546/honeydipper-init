@@ -22,7 +22,7 @@ workflows:
           - busy: "true"
         steps:
           - call_function: '{{ .ctx.ai_system }}.chatContinue'
-          - if: [ $ctx.content ]
+          - if: [ $?ctx.content ]
             call_workflow: notify
             with:
               blocks:
@@ -31,8 +31,9 @@ workflows:
                     text: '{{ .ctx.content }}'
                     type: mrkdwn
               update: true
-          - unless_match:
-              done: "true"
+          - if:
+              - $?ctx.content
+              - '{{ eq .ctx.done "true" | not }}'
             call_workflow: notify
             with:
               blocks:
@@ -40,3 +41,14 @@ workflows:
                   text:
                     text: 'thinking... :thinking_face:'
                     type: mrkdwn
+          - if:
+              - '{{ empty .ctx.content }}'
+              - '$?ctx.done'
+            call_workflow: notify
+            with:
+              blocks:
+                - type: section
+                  text:
+                    text: 'stopped :disappointed:'
+                    type: mrkdwn
+              update: true
