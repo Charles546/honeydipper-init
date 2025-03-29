@@ -22,7 +22,7 @@ workflows:
           - busy: "true"
         steps:
           - call_function: '{{ .ctx.ai_system }}.chatContinue'
-          - if: [ $?ctx.content ]
+          - if: [ "$?ctx.content" ]
             call_workflow: notify
             with:
               blocks:
@@ -33,7 +33,7 @@ workflows:
               update: true
           - if:
               - $?ctx.content
-              - '{{ eq .ctx.done "true" | not }}'
+              - '{{ empty .ctx.done }}'
             call_workflow: notify
             with:
               blocks:
