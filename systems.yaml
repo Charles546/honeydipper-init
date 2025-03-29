@@ -1,8 +1,5 @@
 ---
 systems:
-  slack:
-    data:
-      token: LOOKUP[vault,/secret/data/honeydipper/slack#bot_token]
   slack_bot:
     data:
       token: LOOKUP[vault,/secret/data/honeydipper/slack#bot_token]
@@ -27,13 +24,10 @@ systems:
           engine: $ctx.engine,sysData.engine
           convID: $ctx.convID
           prompt: $ctx.prompt
-        export:
-          content: $?data.content
-          done: $?data.done
+        export_on_success:
           counter: $?data.counter
-          convID: $ctx.convID
+          convID: $?ctx.convID
           busy: $?data.busy
-          raw: $data
 
       chatContinue:
         driver: ollama
@@ -41,10 +35,9 @@ systems:
         parameters:
           convID: $ctx.convID
           counter: $ctx.counter
-        export:
-          content: $?data.content
-          done: $?data.done
-          raw: $data
+        export_on_success:
+          content: $data.content
+          done: $data.done
 
       chatStop:
         driver: ollama
