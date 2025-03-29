@@ -3,7 +3,7 @@ workflows:
   ai_chat:
     with:
       notify*:
-        - reply
+        - $ctx.channel_id
       response_type: in_channel
     steps:
       - call_function: '{{ .ctx.ai_system }}.chat'
@@ -20,13 +20,14 @@ workflows:
                 type: plain_text
             - type: section
               text:
-                text: '{{ .ctx.response }} :thinking2:'
+                text: '{{ .ctx.response }} :thinking_face:'
                 type: mrkdwn
 
       - until_match:
           - done: "true"
           - busy: "true"
         steps:
+          - wait: '5s'
           - call_function: '{{ .ctx.ai_system }}.chatContinue'
             export:
               response+: $ctx.content
@@ -39,7 +40,7 @@ workflows:
                     type: plain_text
                 - type: section
                   text:
-                    text: '{{ .ctx.response }} :thinking2:'
+                    text: '{{ .ctx.response }} :thinking_face:'
                     type: mrkdwn
               update: true
 
