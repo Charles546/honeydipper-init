@@ -1,5 +1,8 @@
 ---
 systems:
+  slack:
+    data:
+      token: LOOKUP[vault,/secret/data/honeydipper/slack#bot_token]
   slack_bot:
     data:
       token: LOOKUP[vault,/secret/data/honeydipper/slack#bot_token]
