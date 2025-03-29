@@ -1,6 +1,10 @@
 ---
 workflows:
   ai_chat:
+    with:
+      notify*:
+        - reply
+      response_type: in_channel
     steps:
       - call_function: '{{ .ctx.ai_system }}.chat'
         with:
