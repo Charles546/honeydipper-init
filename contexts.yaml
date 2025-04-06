@@ -1,8 +1,7 @@
 ---
 contexts:
   _default:
-    notify:
-      chat_system: slack_bot
+    "*":
       notify_on_error-:
         - '#honeydipper-notify'
 
@@ -25,6 +24,9 @@ contexts:
 
     #################### define the parameters needed for the slash commands ########################
     ai_chat:
+      notify*:
+        - $ctx.channel_id
+      response_type: in_channel
       prompt: '{{ trim .ctx.parameters }}'
       convID: onlyone
       ai_system: $ctx.ai_system,"deepseek-r1"

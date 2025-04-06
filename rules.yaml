@@ -10,3 +10,57 @@ rules:
           git_ref: refs/heads/main
       call_workflow: reload
       description: reload honeydipper
+
+  - when:
+      source:
+        system: slack_ai
+        trigger: events
+      if_match:
+        json:
+          event:
+            type: message
+            channel_type: im
+            ':absent:':
+              - subtype
+            ':except:':
+              text: stop
+      export:
+        chat_system: slack_ai
+
+    do:
+      context: mute
+      call_workflow: ai_chat
+      with:
+        - thread_ts: $ctx.slack_payload.event.thread_ts,ctx.slack_payload.event.ts
+          ai_system: $ctx.ai_system,"deepseek-r1"
+          prompt: $ctx.slack_payload.event.text
+        - convID: '{{ .ctx.slack_payload.event.user }}-{{ .ctx.thread_ts }}'
+
+  - when:
+      source:
+        system: slack_ai
+        trigger: events
+      if_match:
+        json:
+          event:
+            type: message
+            channel_type: im
+            text: stop
+            ':present:':
+              - thread_ts
+      export:
+        chat_system: slack_ai
+
+    do:
+      context: mute
+      call_function: '{{ .ctx.ai_system }}.chatStop'
+      with:
+        - thread_ts: $ctx.slack_payload.event.thread_ts
+          ai_system: $ctx.ai_system,"deepseek-r1"
+        - convID: '{{ .ctx.slack_payload.event.user }}-{{ .ctx.thread_ts }}'
+
+  - when:
+      source:
+        system: slack_ai
+        trigger: events_verification
+    do: {}
