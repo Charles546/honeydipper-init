@@ -32,6 +32,7 @@ systems:
                   user: $?sysData.slack_user_id
         export:
           slack_payload: $?event.json
+          slack_user_id: $?sysData.slack_user_id
           notify:
             - '{{ with .event.json.event }}{{ eq .channel_type "im" | ternary .user .channel }}{{ end }}'
       events_verification:
@@ -84,8 +85,22 @@ systems:
           convID: $ctx.convID
           counter: $?ctx.counter
 
+      chatListen:
+        driver: ollama
+        rawAction: chatListen
+        parameters:
+          convID: $ctx.convID
+          user: $ctx.user
+          prompt: $ctx.prompt
+
   deepseek-r1:
     extends:
       - ollama
     data:
       engine: deepseek-r1:1.5b
+
+  llama3:
+    extends:
+      - ollama
+    data:
+      engine: llama3.2:latest
