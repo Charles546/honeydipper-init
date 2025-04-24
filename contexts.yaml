@@ -5,7 +5,6 @@ contexts:
       notify_on_error-:
         - '#honeydipper-notify'
       ai_system: llama3
-      chat_system: slack_bot
 
     channel_translate:
       channel_map:

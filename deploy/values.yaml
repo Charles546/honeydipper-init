@@ -8,7 +8,7 @@ daemon:
     - name: DIPPER_SSH_KEYFILE
       value: dummy
     - name: HD_REDIS_ADDR
-      value: redis:6379
+      value: truenas.lan:6379
     - name: HD_REDIS_AUTH
       value: vault:secret/data/honeydipper/redis#auth
     - name: REPO
