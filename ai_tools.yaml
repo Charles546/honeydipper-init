@@ -14,3 +14,9 @@ workflows:
         json: $?data.json
     else:
       with: '{{ fail "only whitelisted site is allowed" }}'
+
+  ai/get_file_from_github:
+    call_function: github.getContent
+    export:
+      _output:
+        file_content: $ctx.file_content

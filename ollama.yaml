@@ -67,9 +67,37 @@ drivers:
           use the tool web_request to fetch content from internet. Only whiltelisted
           sites are allowed including "www.alphavantge.co" and "api.github.com". The
           return of the tool call is always a json object. You should parse that
-          before you use it, so the data can be properly decoded.
+          before you use it, so the data can be properly decoded. The tool get_file_from_github
+          can be used to fetch file content from github.
         temperature: 0.001
     tools:
+      get_file_from_github:
+        tool:
+          type: function
+          function:
+            name: get_file_from_github
+            description: get file content from github
+            parameters:
+              type: object
+              properties:
+                git_repo:
+                  type:
+                    - string
+                  description: the combined string with user name and repo name, for example myorg/myrepo.
+                path:
+                  type:
+                    - string
+                  decription: the path of the file in the repo, for example /src/index.js
+                git_ref:
+                  type:
+                    - string
+                  description: the branch name, tag name or a commit hash, if missing HEAD branch will be used, for example v1.2, d3e456a or main
+              required:
+                - git_repo
+                - path
+        workflow:
+          call_workflow: ai/get_file_from_github
+
       web_request:
         tool:
           type: function
@@ -89,3 +117,4 @@ drivers:
                 - URL
         workflow:
           call_workflow: ai/web_request
+

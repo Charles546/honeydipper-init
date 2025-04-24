@@ -18,7 +18,7 @@ daemon:
     - name: GEMINI_API_TOKEN
       value: vault:secret/data/honeydipper/gemini#api_key
     - name: DEBUG
-      value: web
+      value: ollama
   image:
     repository: honeydipper/honeydipper
     tag: "CH-ai-cd3c231"
