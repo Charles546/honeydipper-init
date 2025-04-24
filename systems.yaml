@@ -1,106 +1,19 @@
 ---
 systems:
-  slack_bot:
-    data:
-      token: LOOKUP[vault,/secret/data/honeydipper/slack#bot_token]
-      interact_token: $?nil # use signature
-      slash_token: $?nil # use signature
-      signatureHeader: X-Slack-Signature
-      signatureSecret: LOOKUP[vault,/secret/data/honeydipper/slack#signing_secret]
-
-  slack_ai:
-    extends:
-      - slack_bot
-    data:
-      token: LOOKUP[vault,/secret/data/honeydipper/slack_ai#bot_token]
-      interact_token: $?nil # use signature
-      slash_token: $?nil # use signature
-      slack_user_id: U08M6UDCPGR
-      signatureHeader: X-Slack-Signature
-      signatureSecret: LOOKUP[vault,/secret/data/honeydipper/slack_ai#signing_secret]
-      events_path: /ai/slack/events
-    triggers:
-      events:
-        driver: webhook
-        if_match:
-          method: POST
-          url: $sysData.events_path
-          json:
-            ":absent:": challenge
-            ":except:":
-                event:
-                  user: $?sysData.slack_user_id
-        export:
-          slack_payload: $?event.json
-          slack_user_id: $?sysData.slack_user_id
-          notify:
-            - '{{ with .event.json.event }}{{ eq .channel_type "im" | ternary .user .channel }}{{ end }}'
-      events_verification:
-        driver: webhook
-        if_match:
-          method: POST
-          url: $sysData.events_path
-          json:
-            type: url_verification
-        parameters:
-          response_payload: '\$event.json.challenge'
-          response_content_type: 'text/plain'
-
-  github:
-    data:
-      tokenSource: hd_github_app
-      signatureHeader: X-Hub-Signature-256
-      signatureSecret: LOOKUP[vault,/secret/data/honeydipper/github#signing_secret]
-      token: $?nil # use signature
-
-  ollama:
+  ai:
     functions:
-      chat:
-        driver: ollama
-        rawAction: chat
+      web_request:
+        driver: web
+        rawAction: request
         parameters:
-          engine: $ctx.engine,sysData.engine
-          convID: $ctx.convID
-          prompt: $ctx.prompt
-        export_on_success:
-          counter: $?data.counter
-          convID: $?ctx.convID
-          busy: $?data.busy
-
-      chatContinue:
-        driver: ollama
-        rawAction: chatContinue
-        parameters:
-          convID: $ctx.convID
-          counter: $ctx.counter
-        export_on_success:
-          content: $data.content
-          done: $data.done
-          msgType: $data.type
-
-      chatStop:
-        driver: ollama
-        rawAction: chatStop
-        parameters:
-          convID: $ctx.convID
-          counter: $?ctx.counter
-
-      chatListen:
-        driver: ollama
-        rawAction: chatListen
-        parameters:
-          convID: $ctx.convID
-          user: $ctx.user
-          prompt: $ctx.prompt
-
-  deepseek-r1:
-    extends:
-      - ollama
+          URL: '{{ $url := .ctx.URL }}{{ range (dig .ctx.site "url_rewrite" (list) .sysData.sites) }}{{ $url = regexReplaceAll .pattern $url .value }}{{ end }}{{ return $url }}'
+          header: '{{ merge (dig .ctx.site "headers" (dict) .sysData.sites) (default (dict) .ctx.headers) | return }}'
     data:
-      engine: deepseek-r1:1.5b
+      sites:
+        www.alphavantage.co:
+          url_rewrite:
+            - pattern: '$'
+              value: LOOKUP[vault,/secret/data/honeydipper/alphavantage#url_param_api_key]
+          headers:
+            User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/000000000 Safari/537.36")
 
-  llama3:
-    extends:
-      - ollama
-    data:
-      engine: llama3.2:latest

@@ -1,0 +1,38 @@
+---
+systems:
+  gemini:
+    extends:
+      - ollama
+    functions:
+      chat:
+        driver: gemini
+      chatContinue:
+        driver: gemini
+      chatStop:
+        driver: gemini
+      chatListen:
+        driver: gemini
+
+drivers:
+  gemini:
+    engine:
+      default:
+        model: gemini-2.0-flash
+    tools:
+      web_request:
+        tool:
+          functionDeclarations:
+            - name: web_request
+              description: |
+                This function enables the AI mode to access internet. It fetches
+                the content of a web page at the given url.
+              parameters:
+                type: object
+                properties:
+                  URL:
+                    type: string
+                    description: the url for the web page. Don't encode & to '&amp'; don't encode anything.
+                requried:
+                  - URL
+        workflow:
+          call_workflow: ai/web_request

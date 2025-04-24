@@ -1,0 +1,80 @@
+---
+systems:
+  ollama:
+    functions:
+      chat:
+        driver: ollama
+        rawAction: chat
+        parameters:
+          engine: $?ctx.engine,sysData.engine
+          convID: $ctx.convID
+          prompt: $ctx.prompt
+          temperature: $?ctx.temperature,sysData.temperature
+
+        export_on_success:
+          counter: $?data.counter
+          convID: $?ctx.convID
+          busy: $?data.busy
+
+      chatContinue:
+        driver: ollama
+        rawAction: chatContinue
+        parameters:
+          convID: $ctx.convID
+          counter: $ctx.counter
+          timeout: $?ctx.ai_timeout
+        export_on_success:
+          content: $data.content
+          done: $data.done
+          msgType: $data.type
+
+      chatStop:
+        driver: ollama
+        rawAction: chatStop
+        parameters:
+          convID: $ctx.convID
+          counter: $?ctx.counter
+
+      chatListen:
+        driver: ollama
+        rawAction: chatListen
+        parameters:
+          convID: $ctx.convID
+          user: $ctx.user
+          prompt: $ctx.prompt
+
+  deepseek-r1:
+    extends:
+      - ollama
+    data:
+      engine: deepseek-r1:1.5b
+
+  llama3:
+    extends:
+      - ollama
+    data:
+      engine: llama3.2:latest
+
+
+drivers:
+  ollama:
+    non-tools:
+      web_request:
+        tool:
+          type: function
+          function:
+            name: web_request
+            description: |
+              This function enables the AI mode to access internet. It fetches
+              the content of a web page at the given url.
+            parameters:
+              type: object
+              properties:
+                URL:
+                  type:
+                    - string
+                  description: the url for the web page.
+              requried:
+                - URL
+        workflow:
+          call_workflow: ai/web_request

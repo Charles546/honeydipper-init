@@ -1,0 +1,15 @@
+---
+workflows:
+  ai/web_request:
+    with:
+      site: '{{ urlParse .ctx.URL | dig "host" "" }}'
+    if_match:
+      site:
+        - www.alphavantage.co
+        - api.github.com
+    export:
+      _output:
+        payload: $?data.body
+        json: $?data.json
+    else:
+      with: '{{ fail "only whitelisted site is allowed" }}'

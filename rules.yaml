@@ -21,7 +21,7 @@ rules:
   - when:
       source:
         system: slack_ai
-        trigger: events
+        trigger: chat_request
       if_match:
         json:
           event:
@@ -39,14 +39,13 @@ rules:
       call_workflow: ai_chat
       with:
         - thread_ts: $ctx.slack_payload.event.thread_ts,ctx.slack_payload.event.ts
-          ai_system: $ctx.ai_system,"deepseek-r1"
           prompt: $ctx.slack_payload.event.text
         - convID: '{{ .ctx.slack_payload.event.user }}-{{ .ctx.thread_ts }}'
 
   - when:
       source:
         system: slack_ai
-        trigger: events
+        trigger: chat_request
       if_match:
         json:
           event:
@@ -63,7 +62,6 @@ rules:
       call_function: '{{ .ctx.ai_system }}.chatStop'
       with:
         - thread_ts: $ctx.slack_payload.event.thread_ts
-          ai_system: $ctx.ai_system,"deepseek-r1"
         - convID: '{{ .ctx.slack_payload.event.user }}-{{ .ctx.thread_ts }}'
 
   - when:
@@ -75,7 +73,7 @@ rules:
   - when:
       source:
         system: slack_ai
-        trigger: events
+        trigger: chat_request
       if_match:
         json:
           event:
@@ -92,14 +90,13 @@ rules:
       call_workflow: ai_chat
       with:
         - thread_ts: $ctx.slack_payload.event.thread_ts,ctx.slack_payload.event.ts
-          ai_system: $ctx.ai_system,"deepseek-r1"
           prompt: '{{ .ctx.slack_payload.event.text | replace ( printf "<@%s>" .ctx.slack_user_id ) "" }}'
         - convID: '{{ .ctx.slack_payload.event.channel }}-{{ .ctx.thread_ts }}'
 
   - when:
       source:
         system: slack_ai
-        trigger: events
+        trigger: chat_request
       if_match:
         json:
           event:
@@ -114,13 +111,12 @@ rules:
       call_function: '{{ .ctx.ai_system }}.chatStop'
       with:
         - thread_ts: $ctx.slack_payload.event.thread_ts
-          ai_system: $ctx.ai_system,"deepseek-r1"
         - convID: '{{ .ctx.slack_payload.event.channel }}-{{ .ctx.thread_ts }}'
 
   - when:
       source:
         system: slack_ai
-        trigger: events
+        trigger: chat_survey
       if_match:
         json:
           event:
@@ -128,14 +124,12 @@ rules:
             ':absent:':
               - subtype
             ':except:':
-              - channel_type: im
-              - text: ':regex:U08M6UDCPGR'
+              channel_type: im
     do:
       context: mute
       call_function: '{{ .ctx.ai_system }}.chatListen'
       with:
         - thread_ts: $ctx.slack_payload.event.thread_ts,ctx.slack_payload.event.ts
-          ai_system: $ctx.ai_system,"deepseek-r1"
           notify_on_error*: []
           notify*: []
           user: '<@{{ .ctx.slack_payload.event.user }}>'

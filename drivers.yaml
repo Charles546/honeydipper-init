@@ -10,6 +10,7 @@ drivers:
         - name: cache
       operator:
         - name: "driver:ollama"
+        - name: "driver:gemini"
 
     drivers:
       redis-cache:
@@ -22,6 +23,11 @@ drivers:
         type: builtin
         handlerData:
           shortName: hd-driver-ollama
+      gemini:
+        name: gemini
+        type: builtin
+        handlerData:
+          shortName: hd-driver-gemini
 
   redisqueue: &redis
     connection:

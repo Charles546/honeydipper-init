@@ -5,6 +5,7 @@ contexts:
       notify_on_error-:
         - '#honeydipper-notify'
       ai_system: llama3
+      chat_system: slack_bot
 
     channel_translate:
       channel_map:
@@ -30,4 +31,3 @@ contexts:
       response_type: in_channel
       prompt: '{{ trim .ctx.parameters }}'
       convID: onlyone
-      ai_system: $ctx.ai_system,"deepseek-r1"

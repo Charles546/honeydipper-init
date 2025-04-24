@@ -1,12 +1,16 @@
 ---
 repos:
-  - repo: /home/charles/honeydipper-config-essentials
-  - repo: /home/charles/honeydipper-config-essentials
+  - repo: https://github.com/honeydipper/honeydipper-config-essentials.git
+  - repo: https://github.com/honeydipper/honeydipper-config-essentials.git
     path: vault
 
 includes:
   - drivers.yaml
+  - integrations.yaml
   - systems.yaml
   - rules.yaml
   - contexts.yaml
   - workflows.yaml
+  - ollama.yaml
+  - gemini.yaml
+  - ai_tools.yaml
