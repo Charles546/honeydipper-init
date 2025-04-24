@@ -53,13 +53,13 @@ systems:
     extends:
       - ollama
     data:
-      engine: llama3.2
+      engine: llama3_2
 
 
 drivers:
   ollama:
     engine:
-      llama3.2:
+      llama3_2:
         model: llama3.2:latest
         system_prompt: >
           You are an assistant to software engineers. They already know basics of
