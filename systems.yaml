@@ -8,7 +8,7 @@ systems:
         parameters:
           URL: '{{ $url := .ctx.URL }}{{ range (dig .ctx.site "url_rewrite" (list) .sysData.sites) }}{{ $url = regexReplaceAll .pattern $url .value }}{{ end }}{{ return $url }}'
           header: '{{ merge (dig .ctx.site "headers" (dict) .sysData.sites) (default (dict) .ctx.headers) | return }}'
-          tokenSource: $?sysData.sites.{{ .ctx.site }}.tokenSource
+          tokenSource: '{{ dig .ctx.site "tokenSource" .nil .sysData.sites | return }}'
     data:
       sites:
         www.alphavantage.co:
