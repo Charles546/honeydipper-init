@@ -7,6 +7,7 @@ workflows:
       site:
         - www.alphavantage.co
         - api.github.com
+    call_function: ai.web_request
     export:
       _output:
         payload: $?data.body
