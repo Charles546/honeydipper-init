@@ -57,18 +57,18 @@ systems:
 
 
 drivers:
-  engine:
-    llama3.2:
-      model: llama3.2:latest
-      system_prompt: >
-        You are an assistant to software engineers. They already know basics of
-        software engineering. Make your response brief and to the point. You can
-        use the tool web_request to fetch content from internet. Only whiltelisted
-        sites are allowed including "www.alphavantge.co" and "api.github.com". The
-        return of the tool call is always a json object. You should parse that
-        before you use it, so the data can be properly decoded.
-      temperature: 0.001
   ollama:
+    engine:
+      llama3.2:
+        model: llama3.2:latest
+        system_prompt: >
+          You are an assistant to software engineers. They already know basics of
+          software engineering. Make your response brief and to the point. You can
+          use the tool web_request to fetch content from internet. Only whiltelisted
+          sites are allowed including "www.alphavantge.co" and "api.github.com". The
+          return of the tool call is always a json object. You should parse that
+          before you use it, so the data can be properly decoded.
+        temperature: 0.001
     tools:
       web_request:
         tool:
