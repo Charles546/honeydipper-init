@@ -19,7 +19,7 @@ daemon:
       value: vault:secret/data/honeydipper/gemini#api_key
   image:
     repository: honeydipper/honeydipper
-    tag: "CH-ai-e35ae12"
+    tag: "CH-ai-cd3c231"
   pod_annotations:
     vault.security.banzaicloud.io/vault-addr: https://vault.m4cloud.duckdns.org:8200
     vault.security.banzaicloud.io/vault-skip-verify: "false"
