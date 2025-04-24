@@ -19,6 +19,8 @@ workflows:
           - $?ctx.busy
         steps:
           - call_function: '{{ .ctx.ai_system }}.chatContinue'
+            with:
+              timeout: "30"
           - if: [ "$?ctx.content" ]
             call_workflow: notify
             with:
