@@ -25,7 +25,7 @@ workflows:
     with:
       resource_path: search/{{ .ctx.search_type }}
       page_num: $ctx.page_num,"1"
-    step:
+    steps:
       - call_function: github.api
         with:
           method: GET
