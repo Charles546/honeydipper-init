@@ -16,7 +16,6 @@ systems:
       interact_token: $?nil # use signature
       slash_token: $?nil # use signature
       slack_user_id: U08M6UDCPGR
-      _slack_user_id_regex: ':regex:U08M6UDCPGR'
       signatureHeader: X-Slack-Signature
       signatureSecret: LOOKUP[vault,/secret/data/honeydipper/slack_ai#signing_secret]
       events_path: /ai/slack/events
@@ -36,7 +35,8 @@ systems:
             ":except:":
               - event:
                   user: $sysData.slack_user_id,"hiDEme"
-              - text: $sysData._slack_user_id_regex,"hiDEme"
+              - event:
+                  text: ':regex:{{ .sysData.slack_user_id }}'
         export:
           slack_payload: $?event.json
           slack_user_id: $?sysData.slack_user_id
