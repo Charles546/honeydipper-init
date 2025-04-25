@@ -130,7 +130,7 @@ drivers:
                 search_type:
                   type: [ string ]
                   description: the type of the content to search
-                  emu:
+                  enum:
                     - code
                     - commits
                     - issues

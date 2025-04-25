@@ -67,7 +67,7 @@ drivers:
                     type: string
                     description: the type of the content to search
                     format: enum
-                    emu:
+                    enum:
                       - code
                       - commits
                       - issues
