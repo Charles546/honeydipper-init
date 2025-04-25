@@ -139,10 +139,10 @@ drivers:
                     - topics
                     - users
                 page_num:
-                  type: string
+                  type: [ string ]
                   decription: the expected page of the results to return, defaults to 1
                 search_query:
-                  type: string
+                  type: [ string ]
                   description: the search keywords and filters to use for the search
               required:
                 - search_type
