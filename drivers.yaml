@@ -60,4 +60,3 @@ drivers:
         permissions:
           contents: read
           statuses: write
-          repo: read
