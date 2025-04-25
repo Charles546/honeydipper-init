@@ -118,3 +118,34 @@ drivers:
         workflow:
           call_workflow: ai/web_request
 
+      search_github:
+        tool:
+          type: function
+          function:
+            name: search_github
+            description: search code issues users repos on github
+            parameters:
+              type: object
+              properties:
+                search_type:
+                  type: [ string ]
+                  description: the type of the content to search
+                  emu:
+                    - code
+                    - commits
+                    - issues
+                    - labels
+                    - repositories
+                    - topics
+                    - users
+                page_num:
+                  type: string
+                  decription: the expected page of the results to return, defaults to 1
+                search_query:
+                  type: string
+                  description: the search keywords and filters to use for the search
+              required:
+                - search_type
+                - search_query
+        workflow:
+          call_workflow: ai/search_github

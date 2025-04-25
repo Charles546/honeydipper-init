@@ -21,7 +21,7 @@ daemon:
       value: ollama
   image:
     repository: honeydipper/honeydipper
-    tag: "CH-ai-841661f"
+    tag: "CH-ai-b940eb3"
   pod_annotations:
     vault.security.banzaicloud.io/vault-addr: https://vault.m4cloud.duckdns.org:8200
     vault.security.banzaicloud.io/vault-skip-verify: "false"

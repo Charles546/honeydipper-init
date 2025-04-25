@@ -20,3 +20,19 @@ workflows:
     export:
       _output:
         file_content: $ctx.file_content
+
+  ai/search_github:
+    with:
+      resource_path: search/{{ .ctx.search_type }}
+      page_num: $ctx.page_num,"1"
+    step:
+      - call_function: github.api
+        with:
+          method: GET
+          form:
+            q: $ctx.search_query
+            page: $ctx.page_num
+        export:
+          hasMore: '{{ dig "headers" "links" (list "") .data | first | contains "rel=\"next\"" }}'
+    export:
+      _output: '{"search_result": {{ .data.body }}, "page_num": {{ .ctx.page_num }}, "hasMore": {{ .ctx.hasMore }} }'
