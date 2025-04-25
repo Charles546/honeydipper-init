@@ -19,6 +19,7 @@ systems:
       signatureHeader: X-Slack-Signature
       signatureSecret: LOOKUP[vault,/secret/data/honeydipper/slack_ai#signing_secret]
       events_path: /ai/slack/events
+      _slack_user_id_regex: ':regex:U08M6UDCPGR'
     triggers:
       events:
         driver: webhook
@@ -36,7 +37,7 @@ systems:
               - event:
                   user: $sysData.slack_user_id,"hiDEme"
               - event:
-                  text: ':regex:{{ .sysData.slack_user_id }}'
+                  text: $sysData._slack_user_id_regex,"hiDEme"
         export:
           slack_payload: $?event.json
           slack_user_id: $?sysData.slack_user_id
