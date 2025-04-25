@@ -36,5 +36,39 @@ workflows:
           page: $ctx.page_num
       export:
         hasMore: '{{ dig "headers" "links" (list "") .data | first | contains "rel=\"next\"" }}'
+        simplified:
+          total_count: $data.json.total_count
+          items: |
+            {{ $ret := (list) }}
+            {{ $_ := "" }}
+            {{ range .data.json.items }}
+            {{   $item := (dict) }}
+            {{   with .name }}{{ $_ = set $item "name" . }}{{ end }}
+            {{   with .login }}{{ $_ = set $item "login" . }}{{ end }}
+            {{   with .full_name }}{{ $_ = set $item "full_name" . }}{{ end }}
+            {{   with .display_name }}{{ $_ = set $item "display_name" . }}{{ end }}
+            {{   with .sha }}{{ $_ = set $item "sha" . }}{{ end }}
+            {{   with .path }}{{ $_ = set $item "path" . }}{{ end }}
+            {{   with .number }}{{ $_ = set $item "number" . }}{{ end }}
+            {{   with .title }}{{ $_ = set $item "title" . }}{{ end }}
+            {{   with .short_description }}{{ $_ = set $item "short_description" . }}{{ end }}
+            {{   with .description }}{{ $_ = set $item "description" . }}{{ end }}
+            {{   with .state }}{{ $_ = set $item "state" . }}{{ end }}
+            {{   with .state_reason }}{{ $_ = set $item "state_reason" . }}{{ end }}
+            {{   with .disabled }}{{ $_ = set $item "disabled" . }}{{ end }}
+            {{   with .locked }}{{ $_ = set $item "locked" . }}{{ end }}
+            {{   with .visibility }}{{ $_ = set $item "visibility" . }}{{ end }}
+            {{   with .site_admin }}{{ $_ = set $item "site_admin" . }}{{ end }}
+            {{   with .repository }}{{ $_ = set $item "reposiotry" .full_name }}{{ end }}
+            {{   with .commit }}{{ $_ = set $item "commit_message" .message }}{{ end }}
+            {{   with .author }}{{ $_ = set $item "author" .login }}{{ end }}
+            {{   with .user }}{{ $_ = set $item "user" .login }}{{ end }}
+            {{   with .labels }}{{ $l := (list) }}{{ range . }}{{ $l = append $l .name }}{{ end }}{{ $_ = set $item "labels" $l }}{{ end }}
+            {{   $ret = append $ret $item }}
+            {{ end }}
+            {{ return $ret }}
     export:
-      _output: '{"search_result": {{ .data.body }}, "page_num": {{ .ctx.page_num }}, "hasMore": {{ .ctx.hasMore }} }'
+      _output:
+        search_result: $ctx.simplified
+        page_num: $ctx.page_num
+        hasMore: $ctx.hasMore
