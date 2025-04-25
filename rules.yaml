@@ -25,7 +25,6 @@ rules:
       if_match:
         json:
           event:
-            type: message
             channel_type: im
             ':absent:':
               - subtype
@@ -33,6 +32,7 @@ rules:
               text: stop
       export:
         chat_system: slack_ai
+        ai_system: &ai_per_channel '{{ if eq .data.json.event.channel "C08ND4H5ETZ" }}llama3{{ else }}gemini{{ end }}'
 
     do:
       context: mute
@@ -49,13 +49,13 @@ rules:
       if_match:
         json:
           event:
-            type: message
             channel_type: im
             text: stop
             ':present:':
               - thread_ts
       export:
         chat_system: slack_ai
+        ai_system: *ai_per_channel
 
     do:
       context: mute
@@ -84,6 +84,7 @@ rules:
               text: ':regex:stop$'
       export:
         chat_system: slack_ai
+        ai_system: *ai_per_channel
 
     do:
       context: mute
@@ -106,6 +107,7 @@ rules:
               - thread_ts
       export:
         chat_system: slack_ai
+        ai_system: *ai_per_channel
     do:
       context: mute
       call_function: '{{ .ctx.ai_system }}.chatStop'
@@ -120,11 +122,12 @@ rules:
       if_match:
         json:
           event:
-            type: message
             ':absent:':
               - subtype
             ':except:':
               channel_type: im
+      export:
+        ai_system: *ai_per_channel
     do:
       context: mute
       call_function: '{{ .ctx.ai_system }}.chatListen'
@@ -135,3 +138,4 @@ rules:
           user: '<@{{ .ctx.slack_payload.event.user }}>'
           prompt: $ctx.slack_payload.event.text
         - convID: '{{ .ctx.slack_payload.event.channel }}-{{ .ctx.thread_ts }}'
+

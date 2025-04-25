@@ -26,12 +26,15 @@ systems:
         if_match:
           method: POST
           url: $sysData.events_path
+
       chat_survey:
         driver: webhook
         if_match:
           method: POST
           url: $sysData.events_path
           json:
+            event:
+              type: message
             ":absent:": challenge
             ":except:":
               - event:
@@ -43,12 +46,15 @@ systems:
           slack_user_id: $?sysData.slack_user_id
           notify:
             - '{{ with .event.json.event }}{{ eq .channel_type "im" | ternary .user .channel }}{{ end }}'
+
       chat_request:
         driver: webhook
         if_match:
           method: POST
           url: $sysData.events_path
           json:
+            event:
+              type: message
             ":absent:": challenge
             ":except:":
               event:
@@ -58,6 +64,7 @@ systems:
           slack_user_id: $?sysData.slack_user_id
           notify:
             - '{{ with .event.json.event }}{{ eq .channel_type "im" | ternary .user .channel }}{{ end }}'
+
       events_verification:
         driver: webhook
         if_match:
@@ -75,3 +82,4 @@ systems:
       signatureHeader: X-Hub-Signature-256
       signatureSecret: LOOKUP[vault,/secret/data/honeydipper/github#signing_secret]
       token: $?nil # use signature
+

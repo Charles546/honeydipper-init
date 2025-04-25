@@ -4,7 +4,7 @@ contexts:
     "*":
       notify_on_error-:
         - '#honeydipper-notify'
-      ai_system: llama3
+      ai_system-: llama3
 
     channel_translate:
       channel_map:
