@@ -32,7 +32,7 @@ rules:
               text: stop
       export:
         chat_system: slack_ai
-        ai_system: &ai_per_channel '{{ if eq .data.json.event.channel "C08ND4H5ETZ" }}llama3{{ else }}gemini{{ end }}'
+        ai_system: &ai_per_channel '{{ if eq .event.json.event.channel "C08ND4H5ETZ" }}llama3{{ else }}gemini{{ end }}'
 
     do:
       context: mute
