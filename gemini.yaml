@@ -37,16 +37,13 @@ drivers:
                 type: object
                 properties:
                   git_repo:
-                    type:
-                      - string
+                    type: string
                     description: the combined string with user name and repo name, for example myorg/myrepo.
                   path:
-                    type:
-                      - string
+                    type: string
                     decription: the path of the file in the repo, for example /src/index.js
                   git_ref:
-                    type:
-                      - string
+                    type: string
                     description: >
                       the branch name, tag name or a commit hash, if missing
                       HEAD branch will be used, for example v1.2, d3e456a or
