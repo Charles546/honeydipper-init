@@ -79,11 +79,12 @@ drivers:
                     type: string
                     decription: the branch that the changes are pushed into
                   changes:
+                    type: array
                     items:
                       type: object
                       properties:
-                        source_branch:
-                          type: file_content
+                        file_content:
+                          type: string
                           description: >
                             the complete updated content of the file in either
                             utf-8 or base64 encoding
