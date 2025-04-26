@@ -79,7 +79,6 @@ drivers:
                     type: string
                     decription: the branch that the changes are pushed into
                   changes:
-                    type: array
                     items:
                       type: object
                       properties:
