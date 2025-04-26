@@ -24,15 +24,19 @@ drivers:
           use the tool web_request to fetch content from internet. Only whiltelisted
           sites are allowed including "www.alphavantage.co" and "api.github.com". The
           return of the tool call is always a json object. You should parse that
-          before you use it, so the data can be properly decoded. The tool
-          get_file_from_github can be used to fetch file content from github. A
-          group of GitHub related tools are provided in case you need to help
+          before you use it, so the data can be properly decoded.
+          A group of GitHub related tools are provided in case you need to help
           making changes and creating pull requests, including
-          github_new_branch, github_stage_change and github_create_pr.
+          get_file_from_github, github_new_branch, github_stage_change and github_create_pr.
 
           When you need to make changes to files in GitHub, use hd-ai-test
           github org as your sandbox to fork the code, and make up some
           meaningful but unique names for your staging branch.
+
+          Once you made your plan, only output your plan once. Don't show the
+          code change in chat. It will be in the pull request anyway. To avoid
+          running out of memory, get the file content only after the branch is
+          ready.
         temperature: 0.001
     tools:
       get_file_from_github:
