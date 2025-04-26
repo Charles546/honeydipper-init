@@ -72,3 +72,144 @@ workflows:
         search_result: $ctx.simplified
         page_num: $ctx.page_num
         hasMore: $ctx.hasMore
+
+  ai/github_stage_change:
+    steps:
+      - call_function: github_pat.getCommit
+        with:
+          git_ref: refs/heads/{{ .ctx.git_branch }}
+      - with:
+          resource_path: repos/{{ .ctx.git_repo }}/git/blobs
+        iterate: $ctx.changes
+        iterate_as: change
+        steps:
+          - function:
+              target:
+                system: github_pat
+                function: api
+              parameters:
+                method: POST
+                content:
+                  content: $ctx.change.file_content,""
+                  encoding: $ctx.change.encoding,"utf-8"
+            export:
+              tree+:
+                - path: '{{ trimPrefix "/" .ctx.change.path }}'
+                  mode: $ctx.change.mode,"100644"
+                  type: blob
+                  sha: $data.json.sha
+      - with:
+          resource_path: repos/{{ .ctx.git_repo }}/git/trees
+        function:
+          target:
+            system: github_pat
+            function: api
+          parameters:
+            method: POST
+            content:
+              base_tree: refs/heads/{{ .ctx.git_branch }}
+              tree: $ctx.tree
+          export:
+            tree_sha: $data.json.sha
+      - with:
+          resource_path: repos/{{ .ctx.git_repo }}/git/commits
+        function:
+          target:
+            system: github_pat
+            function: api
+          parameters:
+            method: POST
+            content:
+              message: $ctx.commit_message
+              author:
+                name: '$sysData.author.name'
+                email: '$sysData.author.email'
+              parents:
+                - $ctx.git_commit_full
+              tree: $ctx.tree_sha
+          export:
+            git_commit_full: $data.json.sha
+      - call_function: github_pat.updateRef
+        with:
+          git_ref: refs/heads/{{ .ctx.git_branch }}
+    export:
+      _output:
+        new_commit_sha: $ctx.git_commit_full
+
+  ai/github_new_branch:
+    with:
+      source_repo: $ctx.source_repo,ctx.git_repo
+    steps:
+      - on_error: continue
+        steps:
+          - call_function: github.getRepo
+            export_on_success:
+              forked_from: $?data.json.parent.full_name
+              found: $?data.json.full_name
+          - {}
+      - unless_match:
+          - source_repo: $?ctx.found
+          - forked_from: $ctx.source_repo
+        export:
+          error: '{{ printf "the desitnation repo is not the same or a fork of the source repo: %s %s" .ctx.git_repo .ctx.source_repo | fail }}'
+      - unless: [ "$?ctx.found" ]
+        with:
+          resource_path: repos/{{ .ctx.source_repo }}/forks
+        function:
+          target:
+            system: github_pat
+            function: api
+          parameters:
+            method: POST
+            content:
+              organization: '{{ if empty .ctx.fork_personal }}{{ dir .ctx.git_repo }}{{ end }}'
+              name: '{{ base .ctx.git_repo }}'
+              default_branch_only: false
+      - unless: [ "$?ctx.found" ]
+        wait: "2m"
+      - unless_match:
+          found: $ctx.source_repo
+        with:
+          resource_path: repos/{{ .ctx.git_repo }}/merge-upstream
+        function:
+          target:
+            system: github_pat
+            function: api
+          parameters:
+            method: POST
+            content:
+              branch: '{{ .ctx.source_branch }}'
+      - unless_match:
+          source_branch: $ctx.new_branch
+        steps:
+          - call_function: github.getCommit
+            with:
+              git_ref: $ctx.source_branch
+            export:
+              target_sha: $ctx.git_commit_full
+          - on_error: continue
+            steps:
+              - call_function: github.getCommit
+                with:
+                  git_ref: '{{ .ctx.new_branch }}'
+                export_on_success:
+                  current_sha: $?data.json.sha
+              - {}
+          - unless_match:
+              current_sha: $ctx.target_sha
+            with:
+              resource_path: repos/{{ .ctx.git_repo }}/git/refs{{ with .ctx.current_sha }}/heads/{{ $.ctx.new_branch }}{{ end }}
+            function:
+              target:
+                system: github_pat
+                function: api
+              parameters:
+                method: '{{ empty .ctx.current_sha | ternary "POST" "PATCH" }}'
+                content: |
+                  :yaml:---
+                  {{ with .ctx.current_sha }}
+                  force: false
+                  {{ else }}
+                  ref: refs/heads/{{ $.ctx.new_branch }}
+                  {{ end }}
+                  sha: {{ .ctx.target_sha }}

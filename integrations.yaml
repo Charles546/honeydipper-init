@@ -83,3 +83,13 @@ systems:
       signatureSecret: LOOKUP[vault,/secret/data/honeydipper/github#signing_secret]
       token: $?nil # use signature
 
+  github_pat:
+    extends:
+      - github
+    data:
+      oauth_token: LOOKUP[vault,/secret/data/honeydipper/github_pat#token]
+      author:
+        name: Chun Huang(Charles)
+        email: Charles546@users.noreply.github.com
+      tokenSource: $?nil
+

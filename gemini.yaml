@@ -24,8 +24,15 @@ drivers:
           use the tool web_request to fetch content from internet. Only whiltelisted
           sites are allowed including "www.alphavantage.co" and "api.github.com". The
           return of the tool call is always a json object. You should parse that
-          before you use it, so the data can be properly decoded. The tool get_file_from_github
-          can be used to fetch file content from github.
+          before you use it, so the data can be properly decoded. The tool
+          get_file_from_github can be used to fetch file content from github. A
+          group of GitHub related tools are provided in case you need to help
+          making changes and creating pull requests, including
+          github_new_branch, github_stage_change and github_create_pr.
+
+          When you need to make changes to files in GitHub, use hd-ai-test
+          github org as your sandbox to fork the code, and make up some
+          meaningful but unique names for your staging branch.
         temperature: 0.001
     tools:
       get_file_from_github:
@@ -54,6 +61,142 @@ drivers:
                   - path
         workflow:
           call_workflow: ai/get_file_from_github
+
+      github_stage_change:
+        tool:
+          functionDeclarations:
+            - name: github_stage_change
+              description: commit changes to github branch
+              parameters:
+                type: object
+                properties:
+                  git_repo:
+                    type: string
+                    description: >
+                      the full name of the git repo including the user name or
+                      org name, such as, myorg/myrepo.
+                  git_branch:
+                    type: string
+                    decription: the branch that the changes are pushed into
+                  changes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        source_branch:
+                          type: file_content
+                          description: >
+                            the complete updated content of the file in either
+                            utf-8 or base64 encoding
+                        encoding:
+                          type: string
+                          format: enum
+                          enum:
+                            - utf-8
+                            - base64
+                          description: >
+                            the encoding of the file content, either base64 or
+                            utf-8, by default utf-8
+                        path:
+                          type: string
+                          description: the path to the changed file.
+                        mode:
+                          type: string
+                          description: the mode of the changed file, by default "100644"
+                      required:
+                        - file_content
+                        - path
+                required:
+                  - git_repo
+                  - git_branch
+                  - changes
+        workflow:
+          call_workflow: ai/github_stage_change
+
+      github_new_branch:
+        tool:
+          functionDeclarations:
+            - name: github_new_branch
+              description: create a new branch in a repo so changes can be staged.
+              parameters:
+                type: object
+                properties:
+                  git_repo:
+                    type: string
+                    description: >
+                      the full name of the git repo including the user name or
+                      org name, such as, myorg/myrepo.
+                  source_repo:
+                    type: string
+                    decription: >
+                      if forking is needed, specify the source repo to fork,
+                      for example, source_org/source_repo. Must be under
+                      different org or user that `git_repo`.
+                  source_branch:
+                    type: string
+                    description: >
+                      the name of the branch to base the new branch on.
+                  new_branch:
+                    type: string
+                    description: >
+                      the name of the branch. If existed, it will be updated to
+                      match the `source_branch`.
+                required:
+                  - git_repo
+                  - source_branch
+                  - new_branch
+        workflow:
+          call_workflow: ai/github_new_branch
+
+      github_create_pr:
+        tool:
+          functionDeclarations:
+            - name: github_create_pr
+              description: create a GitHub pull request from a branch with already staged changes.
+              parameters:
+                type: object
+                properties:
+                  git_repo:
+                    type: string
+                    description: >
+                      the full name of the git repo including the user name or
+                      org name, such as, myorg/myrepo.
+                  PR_content:
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                        description: the title of the pull request
+                      head:
+                        type: string
+                        description: >
+                          the branch that contains the changes. If the branch
+                          is in a forked repo, prefix the branch name with the
+                          user name and a colon. For example, "my-branch",
+                          "username:my-branch"
+                      head_repo:
+                        type: string
+                        description: >
+                          if the changes are in a forked repo, this specifies
+                          the name of the forked repo, for example
+                          "my-fork/repo"
+                      base:
+                        type: string
+                        description: >
+                          the branch where the changes need to be merged into,
+                          if missing, use the default branch of the repo.
+                      body:
+                        type: string
+                        description: a description of the pull request
+                    required:
+                      - title
+                      - head
+        workflow:
+          call_function: github_pat.createPR
+          export:
+            _output:
+              PR_number: $ctx.PR.number
+              PR_url: $ctx.PR.html_url
 
       search_github:
         tool:
