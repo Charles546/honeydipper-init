@@ -12,6 +12,8 @@ systems:
             Content-Type: application/x-www-form-urlencoded; charset=utf-8
             Accept: application/json
           method: GET
+        export:
+          assert: '{{ if not .data.json.ok }}{{ fail .data.body }}{{ end }}'
 
 workflows:
   chunk_notify:
@@ -35,7 +37,7 @@ workflows:
                     form:
                       filename: code.txt
                       size: '{{ len .ctx.block }}'
-                export:
+                export_on_success:
                   file_id: $data.json.file_id
               - function:
                   driver: web
