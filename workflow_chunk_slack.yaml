@@ -39,11 +39,12 @@ workflows:
                       length: '{{ len .ctx.block }}'
                 export_on_success:
                   file_id: $data.json.file_id
+                  upload_url: $data.json.upload_url
               - function:
                   driver: web
                   rawAction: request
                   parameters:
-                    URL: $data.json.upload_url
+                    URL: $ctx.upload_url
                     method: POST
                     header:
                       Content-Type: application/x-www-form-urlencoded; charset=utf-8
