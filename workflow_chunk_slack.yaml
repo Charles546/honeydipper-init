@@ -32,7 +32,6 @@ workflows:
                     system: '{{ .ctx.chat_system }}'
                     function: api
                   parameters:
-                    header:
                     form:
                       filename: code.txt
                       size: '{{ len .ctx.block }}'
