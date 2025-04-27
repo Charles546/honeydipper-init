@@ -22,26 +22,20 @@ workflows:
             with:
               timeout: "30"
           - if: [ "$?ctx.content" ]
-            call_workflow: notify
-            with:
-              notify*:
-                - $ctx.update_in_channel
-              blocks:
-                - type: section
-                  text:
-                    text: '{{if eq .ctx.msgType "think" }}>{{ end }}{{ .ctx.content }}'
-                    type: mrkdwn
-              update: true
-          - if:
-              - $?ctx.content
-              - '{{ empty .ctx.done }}'
-            call_workflow: notify
-            with:
-              blocks:
-                - type: section
-                  text:
-                    text: '... :thinking_face:'
-                    type: mrkdwn
+            call_workflow: chunk_notify
+          - on_error: continue
+            steps:
+              - if:
+                  - $?ctx.content
+                  - '{{ empty .ctx.done }}'
+                call_workflow: notify
+                with:
+                  blocks:
+                    - type: section
+                      text:
+                        text: '... :thinking_face:'
+                        type: mrkdwn
+              - {}
           - if:
               - '{{ empty .ctx.content }}'
               - '$?ctx.done'

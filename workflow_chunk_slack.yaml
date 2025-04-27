@@ -1,0 +1,127 @@
+---
+systems:
+  slack:
+    functions:
+      api:
+        driver: web
+        rawAction: request
+        parameters:
+          URL: https://slack.com/api/{{ .ctx.resource_path }}
+          header:
+            Authorization: 'Bearer {{ .sysData.token }}'
+            Content-Type: application/x-www-form-urlencoded; charset=utf-8
+            Accept: application/json
+          method: GET
+
+workflows:
+  chunk_notify:
+    with:
+      is_code: false
+      slack_update: true
+    iterate: '{{ splitList "```" .ctx.content | return }}'
+    iterate_as: block
+    steps:
+      - if: [ '{{ len .ctx.block | lt 2990 }}' ]
+        steps:
+          - if: [ '$?ctx.is_code' ]
+            steps:
+              - with:
+                  resource_path: files.getUploadURLExternal
+                function:
+                  target:
+                    system: $ctx.chat_system
+                    function: api
+                  parameters:
+                    header:
+                    form:
+                      filename: code.txt
+                      size: '{{ len .ctx.block }}'
+                export:
+                  file_id: $data.json.file_id
+              - function:
+                  driver: web
+                  rawAction: request
+                  parameters:
+                    URL: $data.json.upload_url
+                    method: POST
+                    header:
+                      Content-Type: application/x-www-form-urlencoded; charset=utf-8
+                    form:
+                      "code.txt": '{{ .ctx.block }}'
+              - with:
+                  resource_path: files.completeUploadExternal
+                function:
+                  target:
+                    system: $ctx.chat_system
+                    function: api
+                  parameters:
+                    method: POST
+                    header:
+                      Content-Type: application/json; charset=utf-8
+                    content:
+                      files:
+                        - id: $ctx.file_id
+                          title: code.txt
+                      channel_id: $ctx.update_in_channel
+                      thread_ts: $ctx.thread_ts
+            else:
+              with:
+                buffer: ""
+              iterate: '{{ cat .ctx.block "\n```" | splitList "\n" | return }}'
+              iterate_as: line
+              steps:
+                - if_any:
+                    - '{{ len .ctx.buffer | add (len .ctx.line) 1 | lt 3000 }}'
+                    - '{{ eq .ctx.line "```" }}'
+                  iterate: |
+                    {{ $chunks := (list) }}{{ $buffer := .ctx.buffer }}
+                    {{ range len .ctx.buffer }}
+                    {{   if gt (len $buffer) 3000 }}
+                    {{     $chunks = append $chunks (slice $buffer 0 3000) }}
+                    {{     $buffer = slice $buffer 3000 }}
+                    {{   else }}
+                    {{     $chunks = append $chunks $buffer }}
+                    {{     break }}
+                    {{   end }}
+                    {{ end }}
+                    {{ return compact $chunks }}
+                  iterate_as: chunk
+                  steps:
+                    - call_workflow: notify
+                      with:
+                        notify*:
+                          - $ctx.update_in_channel
+                        blocks:
+                          - type: section
+                            text:
+                              text: '{{if eq .ctx.msgType "think" }}>{{ end }}{{ .ctx.chunk }}'
+                              type: mrkdwn 
+                        update: $?ctx.slack_update
+                      export:
+                        slack_update: $?nil
+                  export:
+                    buffer: $ctx.line
+                  else:
+                    export:
+                      buffer+: '{{ "\n" }}{{ .ctx.line }}'
+        else:
+          unless: [ '{{ empty .ctx.block }}' ]
+          call_workflow: notify
+          with:
+            notify*:
+              - $ctx.update_in_channel
+            blocks:
+              - type: section
+                text:
+                  text: >
+                    {{if eq .ctx.msgType "think" }}>{{ end }}
+                    {{ with .ctx.is_code }}{{ "\n" }}```{{ "\n" }}{{ end }}
+                    {{ .ctx.block }}
+                    {{ with .ctx.is_code }}{{ "\n" }}```{{ end }}
+                  type: mrkdwn
+            update: $?ctx.slack_update
+          export:
+            slack_update: $?nil
+      - export:
+          is_code: '{{ not $ctx.is_code | return }}'
+

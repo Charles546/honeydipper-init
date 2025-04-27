@@ -15,3 +15,4 @@ includes:
   - ollama.yaml
   - gemini.yaml
   - ai_tools.yaml
+  - workflow_chunk_slack.yaml
