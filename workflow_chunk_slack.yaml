@@ -36,7 +36,7 @@ workflows:
                   parameters:
                     form:
                       filename: code.txt
-                      size: '{{ len .ctx.block }}'
+                      length: '{{ len .ctx.block }}'
                 export_on_success:
                   file_id: $data.json.file_id
               - function:
