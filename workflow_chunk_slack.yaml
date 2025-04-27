@@ -123,5 +123,5 @@ workflows:
           export:
             slack_update: $?nil
       - export:
-          is_code: '{{ not $ctx.is_code | return }}'
+          is_code: '{{ not .ctx.is_code | return }}'
 
