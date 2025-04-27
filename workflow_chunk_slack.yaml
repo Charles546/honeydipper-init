@@ -29,7 +29,7 @@ workflows:
                   resource_path: files.getUploadURLExternal
                 function:
                   target:
-                    system: $ctx.chat_system
+                    system: '{{ .ctx.chat_system }}'
                     function: api
                   parameters:
                     header:
@@ -52,7 +52,7 @@ workflows:
                   resource_path: files.completeUploadExternal
                 function:
                   target:
-                    system: $ctx.chat_system
+                    system: '{{ .ctx.chat_system }}'
                     function: api
                   parameters:
                     method: POST
