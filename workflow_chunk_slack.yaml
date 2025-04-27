@@ -47,9 +47,8 @@ workflows:
                     URL: $ctx.upload_url
                     method: POST
                     header:
-                      Content-Type: application/x-www-form-urlencoded; charset=utf-8
-                    form:
-                      "code.txt": '{{ .ctx.block }}'
+                      Content-Type: text/plain; charset=utf-8
+                    content: $ctx.block
               - with:
                   resource_path: files.completeUploadExternal
                 function:
