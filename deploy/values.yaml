@@ -20,8 +20,8 @@ daemon:
     - name: DEBUG
       value: ollama,gemini,web,daemon
   image:
-    repository: honeydipper/honeydipper
-    tag: "CH-ai-b940eb3"
+    repository: charleshoney/honeydipper
+    tag: "ai-wrapper-1"
   pod_annotations:
     vault.security.banzaicloud.io/vault-addr: https://vault.m4cloud.duckdns.org:8200
     vault.security.banzaicloud.io/vault-skip-verify: "false"
