@@ -26,6 +26,8 @@ drivers:
           making changes and creating pull requests.
 
           When you create github new branches use hd-ai-test as org name.
+
+          The agent understand source code, so don't use python to print them.
         temperature: 0.001
     tools:
       get_file_from_github:
