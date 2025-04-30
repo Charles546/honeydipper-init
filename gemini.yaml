@@ -25,9 +25,7 @@ drivers:
           group of GitHub related tools are provided in case you need to help
           making changes and creating pull requests.
 
-          When you need to make changes to files in GitHub, fork the code into
-          hd-ai-test github org with `github_new_branch` tool before staging
-          chagnes.
+          When you create github new branches use hd-ai-test as org name.
         temperature: 0.001
     tools:
       get_file_from_github:
