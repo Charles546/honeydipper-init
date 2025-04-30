@@ -120,7 +120,11 @@ workflows:
           parameters:
             method: POST
             content:
-              message: $ctx.commit_message
+              message: |
+                {{ .ctx.commit_title }}{{ with .ctx.commit_message }}
+
+                {{ . }}
+                {{ end }}
               author:
                 name: '$sysData.author.name'
                 email: '$sysData.author.email'

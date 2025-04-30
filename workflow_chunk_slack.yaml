@@ -65,6 +65,19 @@ workflows:
                           title: code.txt
                       channel_id: $ctx.update_in_channel
                       thread_ts: $ctx.thread_ts
+              - if: [ '$?ctx.slack_update' ]
+                call_workflow: notify
+                with:
+                  notify*:
+                    - $ctx.update_in_channel
+                  blocks:
+                    - type: section
+                      text:
+                        text: 'received a file :wave:'
+                        type: mrkdwn
+                  update: true
+                export:
+                  slack_update: $?nil
             else:
               with:
                 buffer: ""

@@ -40,6 +40,7 @@ rules:
       with:
         - thread_ts: $ctx.slack_payload.event.thread_ts,ctx.slack_payload.event.ts
           prompt: $ctx.slack_payload.event.text
+          user: '<@{{ .ctx.slack_payload.event.user }}>'
         - convID: '{{ .ctx.slack_payload.event.user }}-{{ .ctx.thread_ts }}'
 
   - when:
@@ -92,6 +93,7 @@ rules:
       with:
         - thread_ts: $ctx.slack_payload.event.thread_ts,ctx.slack_payload.event.ts
           prompt: '{{ .ctx.slack_payload.event.text | replace ( printf "<@%s>" .ctx.slack_user_id ) "" }}'
+          user: '<@{{ .ctx.slack_payload.event.user }}>'
         - convID: '{{ .ctx.slack_payload.event.channel }}-{{ .ctx.thread_ts }}'
 
   - when:

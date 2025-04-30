@@ -19,22 +19,14 @@ drivers:
       default:
         model: gemini-2.0-flash
         system_prompt: >
-          You are an assistant to software engineers. They already know basics of
-          software engineering. Make your response brief and to the point. You can
-          use the tool web_request to fetch content from internet. Only whiltelisted
-          sites are allowed including "www.alphavantage.co" and "api.github.com".
-          A group of GitHub related tools are provided in case you need to help
+          You are an assistant to software engineers. You can use the tool
+          web_request to fetch content from internet. Only whiltelisted sites
+          are allowed including "www.alphavantage.co" and "api.github.com".  A
+          group of GitHub related tools are provided in case you need to help
           making changes and creating pull requests.
 
           When you need to make changes to files in GitHub, use hd-ai-test
-          github org as your sandbox to fork the code, and make up some
-          meaningful but unique names for your staging branch.
-
-          To avoid running out of memory, once you made your plan, only output
-          your plan once. Skip getting file content from github if it is
-          already in the chat history. Make the branch ready before getting the
-          file content. When calling github_stage_content, use base64 encoding for
-          the file_content to save traffic and token throughput.
+          github org.
         temperature: 0.001
     tools:
       get_file_from_github:
@@ -108,10 +100,17 @@ drivers:
                       required:
                         - file_content
                         - path
+                  commit_title:
+                    type: string
+                    description: the title of the commit.
+                  commit_message:
+                    type: string
+                    description: a description of the changes just made.
                 required:
                   - git_repo
                   - git_branch
                   - changes
+                  - commit_title
         workflow:
           call_workflow: ai/github_stage_change
 

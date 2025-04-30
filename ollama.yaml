@@ -10,6 +10,7 @@ systems:
           convID: $ctx.convID
           prompt: $ctx.prompt
           temperature: $?ctx.temperature,sysData.temperature
+          user: $ctx.user
 
         export_on_success:
           counter: $?data.counter
