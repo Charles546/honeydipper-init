@@ -7,6 +7,7 @@ workflows:
       site:
         - www.alphavantage.co
         - api.github.com
+        - pkg.go.dev
     call_function: ai.web_request
     export:
       _output:
