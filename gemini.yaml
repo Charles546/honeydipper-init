@@ -26,7 +26,8 @@ drivers:
 
           When you create github new branches use hd-ai-test as fork org name,
           and prefix the branches with `ai-`.  You are only allowed to commit
-          staged changes to your own branches.
+          staged changes to your own branches. Do not assume the base branch or
+          default branch is `main`.
         temperature: 0.001
 
     tools:
@@ -226,6 +227,29 @@ drivers:
             _output:
               PR_number: $ctx.PR.number
               PR_url: $ctx.PR.html_url
+
+      github_get_default_branch:
+        tool:
+          functionDeclarations:
+            - name: github_get_default_branch
+              description: get the default branch of the repo, do NOT assume it is main or master.
+              parameters:
+                type: object
+                properties:
+                  git_repo:
+                    type: string
+                    description: >
+                      the full name of the git repo, such as, myorg/myrepo.
+                required:
+                  - git_repo
+        workflow:
+          function:
+            target:
+              system: github_pat
+              function: getRepo
+          export:
+            _output:
+              default_branch: $ctx.repo.default_branch
 
       github_update_pr:
         tool:
