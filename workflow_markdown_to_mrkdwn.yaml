@@ -1,0 +1,17 @@
+---
+workflows:
+  markdown_to_mrkdwn:
+    export:
+      mrkdwn: >
+        {{ $ret := .ctx.markdown }}
+        {{ $ret = regexReplaceAll "(^|\\n)(\\s*)- \[ \] (.+)(\\n|$)" $ret "${1}${2}• ☐ ${3}${4}" }}
+        {{ $ret = regexReplaceAll "(^|\\n)(\\s*)- \[[xX]\] (.+)(\\n|$)" $ret "${1}${2}• ☑ ${3}${4}" }}
+        {{ $ret = regexReplaceAll "(^|\\n)(\\s*)- (.+)(\\n|$)" $ret "${1}${2}• ${3}${4}" }}
+        {{ $ret = regexReplaceAll "(^|\\n)#{1,6} (.+)(\\n|$)" $ret "${1}*${2}*${3}" }}
+        {{ $ret = regexReplaceAll "(^|\\s)\*(.+)\*(\\s|$)" $ret "${1}_${2}_${3}" }}
+        {{ $ret = regexReplaceAll "(^|\\s)\*\*(.+)\*\*(\\s|$)" $ret "${1}*${2}*${3}" }}
+        {{ $ret = regexReplaceAll "(^|\\s)__(.+)__(\\s|$)" $ret "${1}*${2}*${3}" }}
+        {{ $ret = regexReplaceAll "(^|\\n)(---|\*\*\*|___)" $ret "${1}──────────" }}
+        {{ $ret = regexReplaceAll "(^|\\s)~~(.+)~~(\\s|$)" $ret "${1}~${2}~${3}" }}
+        {{ $ret = regexReplaceAll "\[.+\]\(.+\)" $ret "<${2}|${1}>" }}
+        {{ return $ret }}

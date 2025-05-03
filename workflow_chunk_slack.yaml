@@ -17,6 +17,15 @@ systems:
 
 workflows:
   chunk_notify:
+    steps:
+      - call_workflow: markdown_to_mrkdwn
+        with:
+          markdown: $ctx.content
+      - call_workflow: chunk_notify_content
+        with:
+          content: $ctx.mrkdwn
+
+  chunk_notify_content:
     with:
       is_code: false
       slack_update: true

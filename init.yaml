@@ -16,3 +16,4 @@ includes:
   - gemini.yaml
   - ai_tools.yaml
   - workflow_chunk_slack.yaml
+  - workflow_markdown_to_mrkdwn.yaml
