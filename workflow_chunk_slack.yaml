@@ -23,7 +23,7 @@ workflows:
           markdown: $ctx.content
       - call_workflow: chunk_notify_content
         with:
-          content: $ctx.mrkdwn
+          content: $ctx.mrkdwn_content
 
   chunk_notify_content:
     with:
