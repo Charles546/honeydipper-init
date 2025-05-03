@@ -35,8 +35,8 @@ drivers:
           functionDeclarations:
             - name: github_stage_change
               description: >
-                stage one updated file. Multiple files can be staged by calling
-                this method mutiple times.
+                stage one updated file in memory. Multiple files can be staged
+                by calling this method mutiple times.
               parameters:
                 type: object
                 properties:
@@ -65,6 +65,22 @@ drivers:
                 encoding: utf-8
                 mode: $?args.mode
               toJson: true
+            output:
+              status: success
+
+      github_clear_staged_changes:
+        tool:
+          functionDeclarations:
+            - name: github_clear_staged_changes
+              description: >
+                clear staged changes from memory
+        workflow:
+          call_driver: cache.del
+          function:
+            rawAction: rpc
+          with:
+            parameters:
+              key: '{{ .prefix }}/github_changes'
             output:
               status: success
 
