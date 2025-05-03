@@ -147,7 +147,7 @@ workflows:
 
   ai/github_new_branch:
     with:
-      assert_fork: '{{ if ne .ctx.for_org "hd-ai-test" }}{{ fail "You are only allowed to create branches in your own fork." }}{{ end }}'
+      assert_fork: '{{ if ne .ctx.fork_org "hd-ai-test" }}{{ fail "You are only allowed to create branches in your own fork." }}{{ end }}'
       git_repo: '{{ with .ctx.fork_org }}{{ . }}/{{ base $.ctx.source_repo }}{{ else }}{{ .ctx.source_repo }}{{ end }}'
     steps:
       - on_error: continue
