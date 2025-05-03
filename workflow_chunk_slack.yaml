@@ -107,7 +107,7 @@ workflows:
                     {{     break }}
                     {{   end }}
                     {{ end }}
-                    {{ return compact $chunks }}
+                    {{ compact $chunks | return }}
                   iterate_as: chunk
                   steps:
                     - call_workflow: notify
