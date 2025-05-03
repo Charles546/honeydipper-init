@@ -15,13 +15,13 @@ daemon:
       value: git@github.com:Charles546/honeydipper-init.git
     - name: OLLAMA_HOST
       value: http://truenas.lan:30068
-    - name: GEMINI_API_TOKEN
+    - name: GOOGLE_API_KEY
       value: vault:secret/data/honeydipper/gemini#api_key
     - name: DEBUG
       value: ollama,gemini,web,daemon
   image:
-    repository: charleshoney/honeydipper
-    tag: "ai-wrapper-1"
+    repository: honeydipper/honeydipper
+    tag: "CH-ai-1612a2b"
   pod_annotations:
     vault.security.banzaicloud.io/vault-addr: https://vault.m4cloud.duckdns.org:8200
     vault.security.banzaicloud.io/vault-skip-verify: "false"

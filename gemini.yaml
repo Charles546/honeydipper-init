@@ -19,17 +19,55 @@ drivers:
       default:
         model: gemini-2.0-flash
         system_prompt: >
-          You are an assistant to software engineers. You can use the tool
-          web_request to fetch content from internet. Only whiltelisted sites
-          are allowed including "www.alphavantage.co" and "api.github.com".  A
-          group of GitHub related tools are provided in case you need to help
-          making changes and creating pull requests.
+          You are an assistant to software engineers.  web_request tool can be
+          used to access internet. Only whiltelisted sites are allowed
+          including "www.alphavantage.co" and "api.github.com". Credentials
+          such as API key will be added automatically.
 
-          When you create github new branches use hd-ai-test as org name.
-
-          The agent understand source code, so don't use python to print them.
+          When you create github new branches use hd-ai-test as fork org name,
+          and prefix the branches with `ai-`.  You are only allowed to commit
+          staged changes to your own branches.
         temperature: 0.001
+
     tools:
+      github_stage_change:
+        tool:
+          functionDeclarations:
+            - name: github_stage_change
+              description: >
+                stage one updated file. Multiple files can be staged by calling
+                this method mutiple times.
+              parameters:
+                type: object
+                properties:
+                  path:
+                    type: string
+                    description: the path of the changed file.
+                  content:
+                    type: string
+                    description: the complete updated file content.
+                  mode:
+                    type: string
+                    description: the mode of the file, defaults to "100644"
+                required:
+                  - path
+                  - content
+        workflow:
+          call_driver: cache.rpush
+          function:
+            rawAction: rpc
+          with:
+            parameters:
+              key: '{{ .prefix }}/github_changes'
+              value:
+                file_content: $args.content
+                path: $args.path
+                encoding: utf-8
+                mode: $?args.mode
+              toJson: true
+            output:
+              status: success
+
       get_file_from_github:
         tool:
           functionDeclarations:
@@ -57,10 +95,10 @@ drivers:
         workflow:
           call_workflow: ai/get_file_from_github
 
-      github_stage_change:
+      github_commit_changes:
         tool:
           functionDeclarations:
-            - name: github_stage_change
+            - name: github_commit_changes
               description: commit changes to github branch
               parameters:
                 type: object
@@ -73,34 +111,6 @@ drivers:
                   git_branch:
                     type: string
                     decription: the branch that the changes are pushed into
-                  changes:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        file_content:
-                          type: string
-                          description: >
-                            the complete updated content of the file in either
-                            utf-8 or base64 encoding
-                        encoding:
-                          type: string
-                          format: enum
-                          enum:
-                            - utf-8
-                            - base64
-                          description: >
-                            the encoding of the file content, either base64 or
-                            utf-8, by default utf-8
-                        path:
-                          type: string
-                          description: the path to the changed file.
-                        mode:
-                          type: string
-                          description: the mode of the changed file, by default "100644"
-                      required:
-                        - file_content
-                        - path
                   commit_title:
                     type: string
                     description: the title of the commit.
@@ -110,10 +120,12 @@ drivers:
                 required:
                   - git_repo
                   - git_branch
-                  - changes
                   - commit_title
         workflow:
-          call_workflow: ai/github_stage_change
+          call_workflow: ai/github_commit_changes
+          with:
+            _local:
+              changes_json: '@cache:del,,github_changes'
 
       github_new_branch:
         tool:
@@ -123,29 +135,28 @@ drivers:
               parameters:
                 type: object
                 properties:
-                  git_repo:
+                  fork_org:
                     type: string
                     description: >
-                      the full name of the git repo including the user name or
-                      org name, such as, myorg/myrepo.
+                      create the branch on a forked repo in this org instead of
+                      using the same repo as source repo.
                   source_repo:
                     type: string
                     decription: >
-                      if forking is needed, specify the source repo to fork,
-                      for example, source_org/source_repo. Must be under
-                      different org or user that `git_repo`.
-                  source_branch:
+                      specify the source repo for the base branch, for example,
+                      source_org/source_repo.
+                  base_branch:
                     type: string
                     description: >
                       the name of the branch to base the new branch on.
                   new_branch:
                     type: string
                     description: >
-                      the name of the branch. If existed, it will be updated to
-                      match the `source_branch`.
+                      the name of the branch to create. If the branch already
+                      existed, it will be updated to match the `source_branch`.
                 required:
-                  - git_repo
-                  - source_branch
+                  - source_repo
+                  - base_branch
                   - new_branch
         workflow:
           call_workflow: ai/github_new_branch
@@ -174,8 +185,8 @@ drivers:
                         description: >
                           the branch that contains the changes. If the branch
                           is in a forked repo, prefix the branch name with the
-                          user name and a colon. For example, "my-branch",
-                          "username:my-branch"
+                          fork org name and a colon. For example, "my-branch",
+                          "my-fork-org:my-branch"
                       head_repo:
                         type: string
                         description: >
@@ -197,6 +208,52 @@ drivers:
           call_function: github_pat.createPR
           export:
             _output:
+              PR_number: $ctx.PR.number
+              PR_url: $ctx.PR.html_url
+
+      github_update_pr:
+        tool:
+          functionDeclarations:
+            - name: github_update_pr
+              description: update a GitHub pull request.
+              parameters:
+                type: object
+                properties:
+                  pr_number:
+                    type: string
+                    description: the PR number
+                  git_repo:
+                    type: string
+                    description: >
+                      the full name of the git repo including the user name or
+                      org name, such as, myorg/myrepo.
+                  PR_content:
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                        description: the title of the pull request
+                      body:
+                        type: string
+                        description: a description of the pull request
+                      state:
+                        type: string
+                        description: the state of the PR open or closed.
+        workflow:
+          function:
+            target:
+              system: github_pat
+              function: api
+            parameters:
+              method: PATCH
+              content: $ctx.PR_content
+            export_on_success:
+              PR: $data.json
+          with:
+            resource_path: repos/{{ .ctx.git_repo }}/pulls/{{ .ctx.pr_number }}
+          export:
+            _output:
+              PR_state: $ctx.PR.state
               PR_number: $ctx.PR.number
               PR_url: $ctx.PR.html_url
 

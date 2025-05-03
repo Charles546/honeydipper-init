@@ -73,7 +73,12 @@ workflows:
         page_num: $ctx.page_num
         hasMore: $ctx.hasMore
 
-  ai/github_stage_change:
+  ai/github_commit_changes:
+    with:
+      - changes: ':yaml:{{ .ctx.changes_json }}'
+      - asserts:
+          branch_black_list: '{{ if has .ctx.git_branch (list "main" "dev") }}{{ fail "You are not allowed to commit changes into protected branches." }}{{ end }}'
+          org_white_list: '{{ if (dir .ctx.git_repo | ne "hd-ai-test") }}{{ fail "You are only allowed to commit to your own fork." }}{{ end }}'
     steps:
       - call_function: github_pat.getCommit
         with:
@@ -142,7 +147,8 @@ workflows:
 
   ai/github_new_branch:
     with:
-      source_repo: $ctx.source_repo,ctx.git_repo
+      assert_fork: '{{ if ne .ctx.for_org "hd-ai-test" }}{{ fail "You are only allowed to create branches in your own fork." }}{{ end }}'
+      git_repo: '{{ with .ctx.fork_org }}{{ . }}/{{ base $.ctx.source_repo }}{{ else }}{{ .ctx.source_repo }}{{ end }}'
     steps:
       - on_error: continue
         steps:
@@ -166,13 +172,13 @@ workflows:
           parameters:
             method: POST
             content:
-              organization: '{{ if empty .ctx.fork_personal }}{{ dir .ctx.git_repo }}{{ end }}'
+              organization: '{{ if empty .ctx.fork_personal }}{{ .ctx.fork_org }}{{ end }}'
               name: '{{ base .ctx.git_repo }}'
-              default_branch_only: false
+              default_branch_only: true
       - unless: [ "$?ctx.found" ]
         wait: "2m"
       - unless_match:
-          found: $ctx.source_repo
+          git_repo: $ctx.source_repo
         with:
           resource_path: repos/{{ .ctx.git_repo }}/merge-upstream
         function:
@@ -182,13 +188,13 @@ workflows:
           parameters:
             method: POST
             content:
-              branch: '{{ .ctx.source_branch }}'
+              branch: '{{ .ctx.base_branch }}'
       - unless_match:
-          source_branch: $ctx.new_branch
+          base_branch: $ctx.new_branch
         steps:
           - call_function: github.getCommit
             with:
-              git_ref: $ctx.source_branch
+              git_ref: $ctx.base_branch
             export:
               target_sha: $ctx.git_commit_full
           - on_error: continue
@@ -200,7 +206,7 @@ workflows:
                   current_sha: $?data.json.sha
               - {}
           - unless_match:
-              current_sha: $ctx.target_sha
+            current_sha: $ctx.target_sha
             with:
               resource_path: repos/{{ .ctx.git_repo }}/git/refs{{ with .ctx.current_sha }}/heads/{{ $.ctx.new_branch }}{{ end }}
             function:
