@@ -54,7 +54,7 @@ systems:
     extends:
       - ollama
     data:
-      engine: qwen3
+      engine: llama3_2
 
 
 drivers:
@@ -117,6 +117,35 @@ drivers:
                 - path
         workflow:
           call_workflow: ai/get_file_from_github
+
+
+      search_knowledge_base:
+        tool:
+          type: function
+          function:
+            name: search_knowledge_base
+            description: >
+              search the knowledge for related information.
+            parameters:
+              type: object
+              properties:
+                question:
+                  type:
+                    - string
+                  description: construct a question to ask to get related info.
+              required:
+                - question
+        workflow:
+          call_driver: "driver:qdrant.query"
+          function:
+            rawAction: rpc
+          with:
+            parameters:
+              question: $args.question
+              knowledge_base: honeydipper_qdrant
+            output:
+              info: $ret.related_info
+              status: success
 
       # search_github:
       #   tool:

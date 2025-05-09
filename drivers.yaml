@@ -11,6 +11,9 @@ drivers:
       operator:
         - name: "driver:ollama"
         - name: "driver:gemini"
+        - name: "driver:embeddings"
+        - name: "driver:gcloud-vectorsearch"
+        - name: "driver:qdrant"
 
     drivers:
       redis-cache:
@@ -28,6 +31,21 @@ drivers:
         type: builtin
         handlerData:
           shortName: hd-driver-gemini
+      gcloud-vectorsearch:
+        name: gcloud-vectorsearch
+        type: builtin
+        handlerData:
+          shortName: gcloud-vectorsearch
+      embeddings:
+        name: embeddings
+        type: builtin
+        handlerData:
+          shortName: hd-driver-embeddings
+      qdrant:
+        name: qdrant
+        type: builtin
+        handlerData:
+          shortName: hd-driver-qdrant
 
   redisqueue: &redis
     connection:
@@ -60,3 +78,33 @@ drivers:
         permissions:
           contents: read
           statuses: write
+
+  embeddings:
+    vertex-ai:
+      project: chess-bot-402618
+      location: us-central1
+    ollama:
+      model: nomic-embed-text:latest
+      host: http://truenas.lan:40068
+
+  qdrant:
+    knowledge_base:
+      honeydipper_qdrant:
+        embedding_method: ollama
+        embedding_model: nomic-embed-text:latest
+        host: truenas.lan
+        port: 15001
+        collection: honeydipper
+
+  gcloud-vectorsearch:
+    knowledge_base:
+      honeydipper:
+        embedding_method: vertex-ai
+        location: us-central1
+        index_endpoint: projects/613142111736/locations/us-central1/indexEndpoints/6042847736535973888
+        deployed_index_id: honeydipper_deployed_05061644
+        redis_prefix: kb/honeydipper
+    connection:
+      Addr: "{% .env.REDIS_ADDR %}"
+      Password: "{% .env.REDIS_AUTH %}"
+      DB: "3"

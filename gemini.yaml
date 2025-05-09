@@ -28,6 +28,9 @@ drivers:
           and prefix the branches with `ai-`.  You are only allowed to commit
           staged changes to your own branches. Do not assume the base branch or
           default branch is `main`.
+
+          If you don't know something, and didn't find useful information in
+          knowledge base, just say you don't know.
         temperature: 0.001
 
     tools:
@@ -346,3 +349,29 @@ drivers:
                   - URL
         workflow:
           call_workflow: ai/web_request
+
+      search_knowledge_base:
+        tool:
+          functionDeclarations:
+            - name: search_knowledge_base
+              description: >
+                search the knowledge for related information.
+              parameters:
+                type: object
+                properties:
+                  question:
+                    type: string
+                    description: construct a question to ask to get related info.
+                required:
+                  - question
+        workflow:
+          call_driver: "driver:qdrant.query"
+          function:
+            rawAction: rpc
+          with:
+            parameters:
+              question: $args.question
+              knowledge_base: honeydipper_qdrant
+            output:
+              info: $ret.related_info
+              status: success
