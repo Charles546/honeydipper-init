@@ -67,9 +67,9 @@ drivers:
       llama3_2:
         model: llama3.2:latest
         temperature: 0.001
-        system_prompt: >
-          DO NOT USE TOOL CALLS, I REPEAT, DO NOT USE TOOL CALLS, UNLESS THE
-          USER REQUESTS.
+        # system_prompt: >
+          # DO NOT USE TOOL CALLS, I REPEAT, DO NOT USE TOOL CALLS, UNLESS THE
+          #  USER REQUESTS.
     tools:
       web_request:
         tool:
