@@ -17,6 +17,7 @@ systems:
       slash_token: $?nil # use signature
       signatureHeader: X-Slack-Signature
       signatureSecret: LOOKUP[vault,/secret/data/honeydipper/slack_ai#signing_secret]
+      events_path: /ai/slack/events
       slack_user_id: U08M6UDCPGR
       _slack_user_id_regex: ':regex:U08M6UDCPGR'
 
