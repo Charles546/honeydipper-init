@@ -1,18 +1,4 @@
 ---
-systems:
-  gemini:
-    extends:
-      - ollama
-    functions:
-      chat:
-        driver: gemini
-      chatContinue:
-        driver: gemini
-      chatStop:
-        driver: gemini
-      chatListen:
-        driver: gemini
-
 drivers:
   gemini:
     engine:

@@ -2,35 +2,19 @@
 drivers:
   daemon:
     configCheckInterval: 60m
-    featureMap:
-      global:
-        cache: redis-cache
     features:
-      global:
-        - name: cache
       operator:
         - name: "driver:ollama"
-        - name: "driver:gemini"
         - name: "driver:embeddings"
         - name: "driver:gcloud-vectorsearch"
         - name: "driver:qdrant"
 
     drivers:
-      redis-cache:
-        name: redis-cache
-        type: builtin
-        handlerData:
-          shortName: redis-cache
       ollama:
         name: ollama
         type: builtin
         handlerData:
           shortName: hd-driver-ollama
-      gemini:
-        name: gemini
-        type: builtin
-        handlerData:
-          shortName: hd-driver-gemini
       gcloud-vectorsearch:
         name: gcloud-vectorsearch
         type: builtin

@@ -21,22 +21,28 @@ rules:
   - when:
       source:
         system: slack_ai
-        trigger: chat_request
+        trigger: events_verification
+    do: {}
+
+  - when:
+      source:
+        system: slack_ai
+        trigger: message_event
       if_match:
         json:
           event:
             channel_type: im
             ':absent:':
               - subtype
-            ':except:':
-              text: stop
+            ':except:+':
+              - text: stop
       export:
         chat_system: slack_ai
         ai_system: &ai_per_channel '{{ if has .event.json.event.channel (list "C08ND4H5ETZ" "D08M6UDEW81") }}llama3{{ else }}gemini{{ end }}'
 
     do:
       context: mute
-      call_workflow: ai_chat
+      call_workflow: ai/chat
       with:
         - thread_ts: $ctx.slack_payload.event.thread_ts,ctx.slack_payload.event.ts
           prompt: $ctx.slack_payload.event.text
@@ -46,7 +52,7 @@ rules:
   - when:
       source:
         system: slack_ai
-        trigger: chat_request
+        trigger: message_event
       if_match:
         json:
           event:
@@ -68,28 +74,21 @@ rules:
   - when:
       source:
         system: slack_ai
-        trigger: events_verification
-    do: {}
-
-  - when:
-      source:
-        system: slack_ai
-        trigger: chat_request
+        trigger: app_mention_event
       if_match:
         json:
           event:
-            type: app_mention
             ':absent:':
               - subtype
-            ':except:':
-              text: ':regex:stop$'
+            ':except:+':
+              - text: ':regex:stop$'
       export:
         chat_system: slack_ai
         ai_system: *ai_per_channel
 
     do:
       context: mute
-      call_workflow: ai_chat
+      call_workflow: ai/chat
       with:
         - thread_ts: $ctx.slack_payload.event.thread_ts,ctx.slack_payload.event.ts
           prompt: '{{ .ctx.slack_payload.event.text | replace ( printf "<@%s>" .ctx.slack_user_id ) "" }}'
@@ -99,11 +98,10 @@ rules:
   - when:
       source:
         system: slack_ai
-        trigger: chat_request
+        trigger: app_mention_event
       if_match:
         json:
           event:
-            type: app_mention
             text: ':regex:stop$'
             ':present:':
               - thread_ts
@@ -120,14 +118,14 @@ rules:
   - when:
       source:
         system: slack_ai
-        trigger: chat_survey
+        trigger: message_event
       if_match:
         json:
           event:
             ':absent:':
               - subtype
-            ':except:':
-              channel_type: im
+            ':except:+':
+              - channel_type: im
       export:
         ai_system: *ai_per_channel
     do:

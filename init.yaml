@@ -3,6 +3,10 @@ repos:
   - repo: https://github.com/honeydipper/honeydipper-config-essentials.git
   - repo: https://github.com/honeydipper/honeydipper-config-essentials.git
     path: vault
+  - repo: https://github.com/honeydipper/honeydipper-config-essentials.git
+    path: ai/gemini
+  - repo: https://github.com/honeydipper/honeydipper-config-essentials.git
+    path: ai
 
 includes:
   - drivers.yaml
@@ -10,9 +14,6 @@ includes:
   - systems.yaml
   - rules.yaml
   - contexts.yaml
-  - workflows.yaml
   - ollama.yaml
   - gemini.yaml
   - ai_tools.yaml
-  - workflow_chunk_slack.yaml
-  - workflow_markdown_to_mrkdwn.yaml

@@ -15,66 +15,10 @@ systems:
       token: LOOKUP[vault,/secret/data/honeydipper/slack_ai#bot_token]
       interact_token: $?nil # use signature
       slash_token: $?nil # use signature
-      slack_user_id: U08M6UDCPGR
       signatureHeader: X-Slack-Signature
       signatureSecret: LOOKUP[vault,/secret/data/honeydipper/slack_ai#signing_secret]
-      events_path: /ai/slack/events
+      slack_user_id: U08M6UDCPGR
       _slack_user_id_regex: ':regex:U08M6UDCPGR'
-    triggers:
-      events:
-        driver: webhook
-        if_match:
-          method: POST
-          url: $sysData.events_path
-
-      chat_survey:
-        driver: webhook
-        if_match:
-          method: POST
-          url: $sysData.events_path
-          json:
-            event:
-              type: message
-            ":absent:": challenge
-            ":except:":
-              - event:
-                  user: $sysData.slack_user_id,"hiDEme"
-              - event:
-                  text: $sysData._slack_user_id_regex,"hiDEme"
-        export:
-          slack_payload: $?event.json
-          slack_user_id: $?sysData.slack_user_id
-          notify:
-            - '{{ with .event.json.event }}{{ eq .channel_type "im" | ternary .user .channel }}{{ end }}'
-
-      chat_request:
-        driver: webhook
-        if_match:
-          method: POST
-          url: $sysData.events_path
-          json:
-            event:
-              type: message
-            ":absent:": challenge
-            ":except:":
-              event:
-                user: $?sysData.slack_user_id
-        export:
-          slack_payload: $?event.json
-          slack_user_id: $?sysData.slack_user_id
-          notify:
-            - '{{ with .event.json.event }}{{ eq .channel_type "im" | ternary .user .channel }}{{ end }}'
-
-      events_verification:
-        driver: webhook
-        if_match:
-          method: POST
-          url: $sysData.events_path
-          json:
-            type: url_verification
-        parameters:
-          response_payload: '\$event.json.challenge'
-          response_content_type: 'text/plain'
 
   github:
     data:
