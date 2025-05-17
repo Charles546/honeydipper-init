@@ -67,29 +67,30 @@ drivers:
       llama3_2:
         model: llama3.2:latest
         temperature: 0.001
-        # system_prompt: >
-          # DO NOT USE TOOL CALLS, I REPEAT, DO NOT USE TOOL CALLS, UNLESS THE
-          #  USER REQUESTS.
+        system_prompt: >
+          You are an assistant. Keep your answer brief and concisive. Feel free
+          to use search_knowledge_base function to look up information. If you
+          cannot find enough information, just say you don't know.
     tools:
-      web_request:
-        tool:
-          type: function
-          function:
-            name: web_request
-            description: |
-              This function enables the AI mode to access internet. Only use
-              when user asks.
-            parameters:
-              type: object
-              properties:
-                URL:
-                  type:
-                    - string
-                  description: the url for the web page.
-              requried:
-                - URL
-        workflow:
-          call_workflow: ai/web_request
+      # web_request:
+      #   tool:
+      #     type: function
+      #     function:
+      #       name: web_request
+      #       description: |
+      #         This function enables the AI mode to access internet. Only use
+      #         when user asks.
+      #       parameters:
+      #         type: object
+      #         properties:
+      #           URL:
+      #             type:
+      #               - string
+      #             description: the url for the web page.
+      #         requried:
+      #           - URL
+      #   workflow:
+      #     call_workflow: ai/web_request
 
       get_file_from_github:
         tool:
